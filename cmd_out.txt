@@ -1,0 +1,5 @@
+
+> vuetify-project@0.0.0 type-check
+> vue-tsc --build --force
+
+src/pages/decisions/components/DecisionDetails.vue(48,113): error TS1002: Unterminated string literal.

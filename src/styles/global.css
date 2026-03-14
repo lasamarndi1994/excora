@@ -1,0 +1,155 @@
+html, body, #app {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.v-application {
+  overflow: hidden;
+}
+
+/* Smooth scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
+
+/* Card hover lift */
+.card-hover {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card-hover:hover {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.10) !important;
+  transform: translateY(-2px);
+}
+
+/* Stat card gradient accents */
+.stat-card-blue  { border-left: 3px solid #4F46E5 !important; }
+.stat-card-green { border-left: 3px solid #10B981 !important; }
+.stat-card-amber { border-left: 3px solid #F59E0B !important; }
+.stat-card-red   { border-left: 3px solid #EF4444 !important; }
+
+/* Sidebar active item */
+.v-list-item--active {
+  background: linear-gradient(90deg, rgba(79,70,229,0.12) 0%, rgba(79,70,229,0.04) 100%) !important;
+  color: #4F46E5 !important;
+  border-radius: 10px !important;
+}
+.v-list-item--active .v-icon { color: #4F46E5 !important; }
+
+/* Input focus ring */
+.v-field--focused .v-field__outline { box-shadow: 0 0 0 3px rgba(79,70,229,0.15); }
+
+/* ── Fix double-border on all input variants ─────────────────────────────────
+   Vuetify 4 renders both a <fieldset> AND .v-field__outline div.
+   We keep only the outline div and hide the fieldset to get a single border.
+*/
+
+/* Outlined: hide the fieldset, let .v-field__outline handle the border */
+.v-field--variant-outlined fieldset {
+  border: none !important;
+}
+.v-field--variant-outlined .v-field__outline {
+  --v-field-border-width: 1px;
+  --v-field-border-opacity: 0.38;
+}
+.v-field--variant-outlined.v-field--focused .v-field__outline {
+  --v-field-border-width: 2px;
+  --v-field-border-opacity: 1;
+}
+.v-field--variant-outlined.v-field--error .v-field__outline {
+  --v-field-border-opacity: 1;
+}
+
+/* Plain: no border at all */
+.v-field--variant-plain .v-field__outline,
+.v-field--variant-plain fieldset {
+  display: none !important;
+}
+.v-field--variant-plain {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Underlined: only bottom border, no fieldset */
+.v-field--variant-underlined fieldset {
+  border: none !important;
+}
+/* ─────────────────────────────────────────────────────────────────────────── */
+
+/* Custom input padding */
+.custom-input .v-field__input {
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+}
+
+/* Board column */
+.board-column {
+  min-width: 290px;
+  width: 290px;
+  max-width: 290px;
+}
+
+/* Issue card hover */
+.issue-card {
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+.issue-card:hover {
+  box-shadow: 0 4px 16px rgba(79,70,229,0.12) !important;
+  transform: translateY(-1px);
+}
+
+/* Hover utilities */
+.hover-bg-surface-variant:hover { background-color: rgb(var(--v-theme-surface-variant)); }
+.hover-underline:hover { text-decoration: underline; }
+.hover-opacity:hover { opacity: 0.75; }
+.hover-text-primary:hover { color: rgb(var(--v-theme-primary)) !important; }
+.hover-bg-grey:hover { background-color: rgb(var(--v-theme-surface-variant)); }
+
+/* Transition */
+.transition-swing { transition: background-color 0.2s cubic-bezier(0.25, 0.8, 0.5, 1); }
+
+/* Gap utilities */
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+
+/* Search input */
+.custom-search-input:focus { border: none !important; outline: none !important; }
+.custom-board-input :deep(.v-field__input) {
+  min-height: 36px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Pill badge */
+.pill-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* Page container */
+.page-container {
+  background-color: rgb(var(--v-theme-background));
+  min-height: 100vh;
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glass card */
+.glass-card {
+  background: rgba(255,255,255,0.7) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}

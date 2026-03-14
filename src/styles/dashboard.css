@@ -1,0 +1,56 @@
+/* Modern Dashboard Styles */
+
+.dashboard-container {
+  background-color: rgb(var(--v-theme-background));
+  min-height: 100vh;
+}
+
+/* Modern card */
+.modern-card {
+  background: rgb(var(--v-theme-surface));
+  border-radius: 16px !important;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.modern-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-2px);
+}
+
+/* Stat card accent borders */
+.stat-card-blue  { border-left: 3px solid #4F46E5 !important; }
+.stat-card-green { border-left: 3px solid #10B981 !important; }
+.stat-card-amber { border-left: 3px solid #F59E0B !important; }
+.stat-card-red   { border-left: 3px solid #EF4444 !important; }
+
+/* Card hover lift */
+.card-hover {
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card-hover:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08) !important;
+  transform: translateY(-2px);
+}
+
+/* Glass effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Gradient text */
+.text-gradient-primary {
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Activity timeline */
+.activity-timeline :deep(.v-timeline-divider) {
+  min-width: 40px;
+}
