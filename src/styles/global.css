@@ -1,11 +1,10 @@
 html, body, #app {
   height: 100%;
-  overflow: hidden;
   font-family: 'Inter', sans-serif !important;
 }
 
 .v-application {
-  overflow: hidden;
+  overflow: auto;
 }
 
 /* Smooth scrollbar */

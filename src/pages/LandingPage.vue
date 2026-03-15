@@ -1,353 +1,246 @@
 <template>
-  <div class="landing-page">
+  <div class="landing">
+
     <!-- Navbar -->
-    <v-app-bar color="transparent" flat class="px-md-16 px-4 pt-4 backdrop-blur" absolute>
-      <v-avatar color="primary" class="mr-3" rounded="lg">
-        <v-icon color="white">mdi-checkbox-marked-circle-outline</v-icon>
-      </v-avatar>
-      <span class="text-h6 font-weight-bold text-primary">Execora</span>
-
-      <v-spacer></v-spacer>
-
-      <div class="d-none d-md-flex">
-        <v-btn variant="text" class="text-capitalize mx-1 font-weight-medium">Features</v-btn>
-        <v-btn variant="text" class="text-capitalize mx-1 font-weight-medium">Solutions</v-btn>
-
+    <div class="navbar">
+      <div class="navbar-inner">
+        <div class="d-flex align-center gap-2">
+          <v-avatar color="primary" size="28" rounded="lg">
+            <v-icon color="white" size="16">mdi-checkbox-marked-circle-outline</v-icon>
+          </v-avatar>
+          <span class="brand">Execora</span>
+        </div>
+        <div class="d-flex align-center gap-4">
+          <a href="#" class="nav-link">Features</a>
+          <a href="#" class="nav-link">Solutions</a>
+          <v-btn color="primary" size="small" rounded="lg" class="text-none font-weight-medium px-4" to="/auth/login">
+            Login
+          </v-btn>
+        </div>
       </div>
-
-      <v-btn color="primary" variant="flat" rounded="lg" class="ml-4 px-6 font-weight-bold" to="/auth/login">
-        Login
-      </v-btn>
-    </v-app-bar>
-
-    <!-- Hero Section -->
-    <v-container fluid class="hero-section d-flex align-center position-relative overflow-hidden">
-      <div class="bg-shape-1"></div>
-      <div class="bg-shape-2"></div>
-
-      <v-container class="position-relative z-10">
-        <v-row align="center" justify="space-between">
-          <v-col cols="12" md="6" class="py-10">
-            <v-chip color="primary" variant="tonal" label class="mb-6 font-weight-bold px-4" size="default"
-              style="border-radius: 8px;">
-              ✨ The #1 Software Development Tool
-            </v-chip>
-            <h1 class="text-h3 text-md-h2 font-weight-black  text-high-emphasis mb-4 leading-tight display-large">
-              Move fast, <br>
-              <span class="text-gradient">stay aligned</span>, <br>
-              and build better.
-            </h1>
-            <p class="text-body-1 text-md-h6 text-medium-emphasis mb-8" style="max-width: 480px; line-height: 1.6;">
-              The only project management tool you need to plan, track, and release world-class software with zero
-              friction.
-            </p>
-
-            <div class="d-flex flex-wrap gap-4">
-              <v-btn color="primary" size="x-large" rounded="lg" elevation="6" class="px-8 font-weight-bold button-glow"
-                to="/board">
-                Get Started Free
-              </v-btn>
-              <v-btn variant="outlined" color="secondary" size="x-large" rounded="lg"
-                class="px-8 font-weight-bold bg-surface">
-                View Demo
-              </v-btn>
-            </div>
-
-            <div class="mt-10 d-flex align-center text-medium-emphasis text-body-2">
-              <div class="d-flex mr-6 align-center">
-                <v-icon color="success" class="mr-2" size="20">mdi-check-circle</v-icon> No credit card required
-              </div>
-              <div class="d-flex align-center">
-                <v-icon color="success" class="mr-2" size="20">mdi-check-circle</v-icon> Free for up to 10 users
-              </div>
-            </div>
-          </v-col>
-
-          <v-col cols="12" md="6" class="d-none d-md-flex justify-center position-relative perspective-container">
-            <!-- Dashboard Preview -->
-            <v-card width="100%" max-width="650"
-              class="rounded-xl overflow-hidden glass-card elevation-24 hero-dashboard"
-              image="https://cdn.vuetifyjs.com/images/parallax/material.jpg">
-              <div class="fill-height d-flex flex-column bg-surface">
-                <!-- Fake Header -->
-                <div class="pa-3 border-b d-flex align-center bg-surface-variant">
-                  <div class="d-flex gap-2">
-                    <div class="rounded-circle bg-error" style="width: 10px; height: 10px;"></div>
-                    <div class="rounded-circle bg-warning" style="width: 10px; height: 10px;"></div>
-                    <div class="rounded-circle bg-success" style="width: 10px; height: 10px;"></div>
-                  </div>
-                </div>
-                <!-- Fake Body -->
-                <div class="d-flex fill-height bg-background pa-4">
-                  <!-- Sidebar -->
-                  <div class="bg-surface-variant rounded-lg elevation-1 pa-3 mr-4" style="width: 60px;">
-                    <div class="bg-primary rounded mb-4" style="height: 40px;"></div>
-                    <div class="bg-grey-lighten-3 rounded mb-2" style="height: 20px;"></div>
-                    <div class="bg-grey-lighten-3 rounded mb-2" style="height: 20px;"></div>
-                  </div>
-                  <!-- Board -->
-                  <div class="flex-grow-1 d-flex gap-4 overflow-hidden">
-                    <div class="bg-surface-variant rounded-lg flex-grow-1 pa-2">
-                      <div class="text-caption font-weight-bold mb-2 ml-1 text-medium-emphasis">TO DO</div>
-                      <div class="bg-surface rounded pa-3 mb-2 elevation-1 border-s-4 border-primary">
-                        <div class="bg-surface-variant rounded mb-2" style="width: 80%; height: 10px;"></div>
-                        <div class="bg-background rounded" style="width: 40%; height: 8px;"></div>
-                      </div>
-                      <div class="bg-surface rounded pa-3 mb-2 elevation-1">
-                        <div class="bg-surface-variant rounded mb-2" style="width: 90%; height: 10px;"></div>
-                        <div class="bg-background rounded" style="width: 50%; height: 8px;"></div>
-                      </div>
-                    </div>
-                    <div class="bg-surface-variant rounded-lg flex-grow-1 pa-2">
-                      <div class="text-caption font-weight-bold mb-2 ml-1 text-medium-emphasis">IN PROGRESS</div>
-                      <div class="bg-surface rounded pa-3 mb-2 elevation-1 border-s-4 border-warning">
-                        <div class="bg-surface-variant rounded mb-2" style="width: 70%; height: 10px;"></div>
-                        <div class="d-flex justify-space-between align-center mt-2">
-                          <div class="bg-background rounded" style="width: 30%; height: 8px;"></div>
-                          <v-avatar size="20" color="info"></v-avatar>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </v-card>
-
-            <!-- Floating Badge 1 -->
-            <v-card class="position-absolute floating-card-1 rounded-lg pa-4 elevation-10" width="220"
-              style="right: -20px; bottom: 80px;">
-              <div class="d-flex align-center mb-3">
-                <v-avatar color="success" size="32" class="mr-3"><v-icon size="18"
-                    color="white">mdi-check</v-icon></v-avatar>
-                <div>
-                  <div class="text-caption font-weight-bold">Sprint Velocity</div>
-                  <div class="text-caption text-success font-weight-bold">+24% Increase</div>
-                </div>
-              </div>
-              <v-progress-linear model-value="85" color="success" height="6" rounded
-                bg-color="green-lighten-4"></v-progress-linear>
-            </v-card>
-
-            <!-- Floating Badge 2 -->
-            <v-card class="position-absolute floating-card-2 rounded-lg pa-3 elevation-10" width="180"
-              style="left: -20px; top: 100px;">
-              <div class="d-flex align-center">
-                <v-avatar size="32" color="warning" class="mr-3">
-                  <span class="text-white text-caption font-weight-bold">JS</span>
-                </v-avatar>
-                <div>
-                  <div class="text-caption font-weight-bold">New Comment</div>
-                  <div class="text-caption text-medium-emphasis text-truncate" style="max-width: 100px;">LGTM! Ship it
-                    🚀</div>
-                </div>
-              </div>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-container>
-
-    <!-- Trusted By Section -->
-    <div class="bg-surface-variant py-10 border-y">
-      <v-container>
-        <p class="text-center text-caption font-weight-bold text-medium-emphasis text-uppercase mb-8 tracking-wide">
-          Web applications</p>
-        <v-row justify="center" align="center" class="opacity-60 grayscale pb-4">
-          <v-col cols="6" sm="4" md="2" class="d-flex justify-center">
-            <h3 class="text-h6 font-weight-black text-medium-emphasis">Aliceblue</h3>
-          </v-col>
-          <v-col cols="6" sm="4" md="2" class="d-flex justify-center">
-            <h3 class="text-h6 font-weight-black text-medium-emphasis">Rise</h3>
-          </v-col>
-          <v-col cols="6" sm="4" md="2" class="d-flex justify-center">
-            <h3 class="text-h6 font-weight-black text-medium-emphasis">BOT</h3>
-          </v-col>
-          <v-col cols="6" sm="4" md="2" class="d-flex justify-center">
-            <h3 class="text-h6 font-weight-black text-medium-emphasis">EKYC</h3>
-          </v-col>
-          <v-col cols="6" sm="4" md="2" class="d-flex justify-center">
-            <h3 class="text-h6 font-weight-black text-medium-emphasis">ANT</h3>
-          </v-col>
-        </v-row>
-      </v-container>
     </div>
 
-    <!-- Features Section -->
-    <v-container class="py-16">
-      <div class="text-center mb-16">
-        <h2 class="text-h4 font-weight-bold mb-4">Everything you need to deliver</h2>
-        <p class="text-subtitle-1 text-medium-emphasis mx-auto" style="max-width: 600px;">Stop juggling multiple tools.
-          Execora brings your entire product lifecycle into one unified platform.</p>
-      </div>
-
-      <v-row>
-        <v-col cols="12" md="4">
-          <v-card class="pa-8 h-100 rounded-xl feature-card border-thin" variant="outlined">
-            <v-avatar color="primary" variant="tonal" rounded="lg" size="56" class="mb-6">
-              <v-icon color="primary" size="28">mdi-kanban</v-icon>
-            </v-avatar>
-            <h3 class="text-h5 font-weight-bold mb-3">Flexible Kanban Boards</h3>
-            <p class="text-body-2 text-medium-emphasis leading-loose">
-              Visualize work, limit work-in-progress, and maximize efficiency with our powerful, customizable boards.
-            </p>
-          </v-card>
-        </v-col>
-        <v-col cols="12" md="4">
-          <v-card class="pa-8 h-100 rounded-xl feature-card border-thin" variant="outlined">
-            <v-avatar color="purple" variant="tonal" rounded="lg" size="56" class="mb-6">
-              <v-icon color="purple" size="28">mdi-run-fast</v-icon>
-            </v-avatar>
-            <h3 class="text-h5 font-weight-bold mb-3">Sprint Planning</h3>
-            <p class="text-body-2 text-medium-emphasis leading-loose">
-              Plan upcoming sprints, prioritize your backlog, and assign tasks with ease to keep your team meaningful
-              aligned.
-            </p>
-          </v-card>
-        </v-col>
-        <v-col cols="12" md="4">
-          <v-card class="pa-8 h-100 rounded-xl feature-card border-thin" variant="outlined">
-            <v-avatar color="success" variant="tonal" rounded="lg" size="56" class="mb-6">
-              <v-icon color="success" size="28">mdi-chart-line</v-icon>
-            </v-avatar>
-            <h3 class="text-h5 font-weight-bold mb-3">Real-time Insights</h3>
-            <p class="text-body-2 text-medium-emphasis leading-loose">
-              Gain visibility into your team's performance with out-of-the-box reports, velocity charts, and burndown
-              diagrams.
-            </p>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-
-    <!-- Value Prop / Why Us Section -->
-    <v-container fluid class="bg-surface-variant py-16">
-      <v-container>
-        <v-row align="center" class="mb-16">
-          <v-col cols="12" md="6" class="pr-md-16">
-            <h2 class="text-h3 text-md-h2 font-weight-black text-high-emphasis mb-4 leading-tight">
-              Focus on code, <br>
-              <span class="text-gradient">not chaos.</span>
-            </h2>
-            <p class="text-body-1 text-medium-emphasis mb-6">
-              Developers love Execora because it stays out of their way. GitHub & GitLab integrations mean you can
-              update
-              status directly from your commit messages.
-            </p>
-            <div class="d-flex flex-column gap-3">
-              <div class="d-flex align-center">
-                <v-icon color="primary" class="mr-3">mdi-check</v-icon>
-                <span class="font-weight-medium text-high-emphasis">Two-way Git synchronization</span>
-              </div>
-              <div class="d-flex align-center">
-                <v-icon color="primary" class="mr-3">mdi-check</v-icon>
-                <span class="font-weight-medium text-high-emphasis">Automated CI/CD workflows</span>
-              </div>
-              <div class="d-flex align-center">
-                <v-icon color="primary" class="mr-3">mdi-check</v-icon>
-                <span class="font-weight-medium text-high-emphasis">Smart commit linking</span>
-              </div>
-            </div>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-card class="rounded-xl elevation-5 overflow-hidden border">
-              <!-- Code block simulation -->
-              <div class="bg-secondary pa-4 text-white font-mono text-caption">
-                <div class="mb-2"><span class="text-pink">git</span> commit -m <span class="text-green">"feat: add login
-                    page #PROJ-123"</span></div>
-                <div class="mb-2 text-grey">PROJ-123 moved to In Progress</div>
-                <div><span class="text-blue">➜</span> <span class="text-cyan">my-app</span> <span
-                    class="text-amber">git:(main)</span> <span class="text-green">✔</span></div>
-              </div>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-container>
-
-    <!-- CTA Section -->
-    <v-container class="py-16 text-center">
-      <v-card color="primary" class="rounded-xl overflow-hidden position-relative pa-16 elevation-10" theme="dark">
-        <!-- Background Decoration -->
-        <div class="position-absolute top-0 right-0 opacity-20" style="transform: translate(30%, -30%)">
-          <v-icon size="400" color="white">mdi-rocket-launch</v-icon>
-        </div>
-
-        <div class="position-relative z-10">
-          <h2 class="text-h3 font-weight-black mb-6">Ready to transform how you work?</h2>
-          <p class="text-h6 text-white mb-8 opacity-90 mx-auto" style="max-width: 600px;">
-            Join thousands of high-performing teams using Execora today.
+    <!-- Hero -->
+    <div class="hero-section">
+      <div class="hero-bg-blob"></div>
+      <div class="hero-inner">
+        <!-- Left -->
+        <div class="hero-left">
+          <div class="hero-badge">✨ The #1 Software Development Tool</div>
+          <h1 class="hero-title">
+            Move fast,<br>
+            <span class="text-grad">stay aligned</span>,<br>
+            and build better.
+          </h1>
+          <p class="hero-sub">
+            The only project management tool you need to plan, track, and release world-class software with zero friction.
           </p>
-          <v-btn size="x-large" variant="flat" color="white" class="text-primary font-weight-bold px-10 rounded-lg"
-            to="/board">
-            Start Your Free Trial
-          </v-btn>
-          <p class="text-caption mt-6 opacity-70">14-day free trial. No credit card required.</p>
-        </div>
-      </v-card>
-    </v-container>
-
-    <!-- Footer -->
-    <v-footer class="bg-surface text-medium-emphasis py-12 border-t">
-      <v-container>
-        <v-row>
-          <v-col cols="12" md="4" class="mb-8 mb-md-0">
-            <div class="d-flex align-center mb-4">
-              <v-avatar color="primary" class="mr-3" size="32" rounded="lg">
-                <v-icon color="white" size="18">mdi-checkbox-marked-circle-outline</v-icon>
-              </v-avatar>
-              <span class="text-h6 font-weight-bold text-primary">Execora</span>
-            </div>
-            <p class="text-body-2 mb-6" style="max-width: 300px;">
-              Empowering teams to achieve greatness through better collaboration and organization.
-            </p>
-            <div class="d-flex gap-2">
-              <v-btn icon density="comfortable" variant="tonal" class="rounded-lg"><v-icon>mdi-twitter</v-icon></v-btn>
-              <v-btn icon density="comfortable" variant="tonal" class="rounded-lg"><v-icon>mdi-linkedin</v-icon></v-btn>
-              <v-btn icon density="comfortable" variant="tonal" class="rounded-lg"><v-icon>mdi-github</v-icon></v-btn>
-            </div>
-          </v-col>
-
-          <v-col cols="6" md="2">
-            <h4 class="font-weight-bold mb-4">Product</h4>
-            <div class="d-flex flex-column gap-2 text-body-2">
-              <a href="#" class="text-decoration-none text-medium-emphasis hover-primary">Features</a>
-              <a href="#" class="text-decoration-none text-medium-emphasis hover-primary">Security</a>
-              <a href="#" class="text-decoration-none text-medium-emphasis hover-primary">Enterprise</a>
-            </div>
-          </v-col>
-
-          <v-col cols="6" md="2">
-            <h4 class="font-weight-bold mb-4">Resources</h4>
-            <div class="d-flex flex-column gap-2 text-body-2">
-              <a href="#" class="text-decoration-none text-medium-emphasis hover-primary">Documentation</a>
-              <a href="#" class="text-decoration-none text-medium-emphasis hover-primary">API</a>
-              <a href="#" class="text-decoration-none text-medium-emphasis hover-primary">Community</a>
-              <a href="#" class="text-decoration-none text-medium-emphasis hover-primary">Blog</a>
-            </div>
-          </v-col>
-
-          <v-col cols="12" md="4">
-            <h4 class="font-weight-bold mb-4">Stay up to date</h4>
-            <v-text-field density="comfortable" bg-color="surface-variant" hide-details placeholder="Enter your email"
-              variant="outlined" rounded="lg" class="mb-2">
-              <template v-slot:append-inner>
-                <v-btn size="small" color="primary" class="rounded-md">Subscribe</v-btn>
-              </template>
-            </v-text-field>
-          </v-col>
-        </v-row>
-
-        <v-divider class="my-8"></v-divider>
-
-        <div class="d-flex flex-column flex-md-row justify-space-between align-center text-caption">
-          <span>© 2026 MyTask Inc. All rights reserved.</span>
-          <div class="d-flex gap-4 mt-4 mt-md-0">
-            <a href="#" class="text-decoration-none text-medium-emphasis hover-primary">Privacy Policy</a>
-            <a href="#" class="text-decoration-none text-medium-emphasis hover-primary">Terms of Service</a>
+          <div class="d-flex align-center gap-3 mt-6">
+            <v-btn color="primary" size="small" rounded="lg" class="text-none font-weight-medium px-5" to="/board" elevation="2">
+              Get Started Free
+            </v-btn>
+            <v-btn variant="outlined" color="secondary" size="small" rounded="lg" class="text-none font-weight-medium px-5">
+              View Demo
+            </v-btn>
+          </div>
+          <div class="hero-checks">
+            <span><v-icon color="success" size="14" class="mr-1">mdi-check-circle</v-icon>No credit card required</span>
+            <span><v-icon color="success" size="14" class="mr-1">mdi-check-circle</v-icon>Free for up to 10 users</span>
           </div>
         </div>
-      </v-container>
-    </v-footer>
+
+        <!-- Right: dashboard mockup -->
+        <div class="hero-right">
+          <div class="mockup-card">
+            <!-- window chrome -->
+            <div class="mockup-chrome">
+              <span class="dot dot-red"></span>
+              <span class="dot dot-yellow"></span>
+              <span class="dot dot-green"></span>
+            </div>
+            <div class="mockup-body">
+              <!-- sidebar -->
+              <div class="mockup-sidebar">
+                <div class="mock-block primary-block"></div>
+                <div class="mock-block grey-block"></div>
+                <div class="mock-block grey-block"></div>
+                <div class="mock-block grey-block"></div>
+              </div>
+              <!-- columns -->
+              <div class="mockup-cols">
+                <div class="mock-col">
+                  <div class="mock-col-label">TO DO</div>
+                  <div class="mock-task border-primary-l"></div>
+                  <div class="mock-task"></div>
+                </div>
+                <div class="mock-col">
+                  <div class="mock-col-label">IN PROGRESS</div>
+                  <div class="mock-task border-warning-l"></div>
+                </div>
+                <div class="mock-col">
+                  <div class="mock-col-label">DONE</div>
+                  <div class="mock-task border-success-l"></div>
+                  <div class="mock-task border-success-l"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- floating badges -->
+          <div class="float-badge float-badge-1">
+            <v-avatar color="warning" size="24" class="mr-2">
+              <span style="font-size:9px;color:white;font-weight:700">JS</span>
+            </v-avatar>
+            <div>
+              <div class="badge-title">New Comment</div>
+              <div class="badge-sub">LGTM! Ship it 🚀</div>
+            </div>
+          </div>
+
+          <div class="float-badge float-badge-2">
+            <v-avatar color="success" size="24" class="mr-2">
+              <v-icon size="13" color="white">mdi-check</v-icon>
+            </v-avatar>
+            <div>
+              <div class="badge-title">Sprint Velocity</div>
+              <div class="badge-sub text-success">+24% Increase</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trusted by -->
+    <div class="trusted-section">
+      <div class="trusted-label">WEB APPLICATIONS</div>
+      <div class="trusted-logos">
+        <span>Aliceblue</span>
+        <span>Rise</span>
+        <span>BOT</span>
+        <span>EKYC</span>
+        <span>ANT</span>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features-section">
+      <div class="section-center">
+        <h2 class="section-title">Everything you need to deliver</h2>
+        <p class="section-sub">Stop juggling multiple tools. Execora brings your entire product lifecycle into one unified platform.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#eff6ff">
+            <v-icon color="primary" size="22">mdi-kanban</v-icon>
+          </div>
+          <h3 class="feature-title">Flexible Kanban Boards</h3>
+          <p class="feature-desc">Visualize work, limit work-in-progress, and maximize efficiency with our powerful, customizable boards.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#f5f3ff">
+            <v-icon color="purple" size="22">mdi-run-fast</v-icon>
+          </div>
+          <h3 class="feature-title">Sprint Planning</h3>
+          <p class="feature-desc">Plan upcoming sprints, prioritize your backlog, and assign tasks with ease to keep your team meaningfully aligned.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" style="background:#f0fdf4">
+            <v-icon color="success" size="22">mdi-chart-line</v-icon>
+          </div>
+          <h3 class="feature-title">Real-time Insights</h3>
+          <p class="feature-desc">Gain visibility into your team's performance with out-of-the-box reports, velocity charts, and burndown diagrams.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Focus section -->
+    <div class="focus-section">
+      <div class="focus-inner">
+        <div class="focus-left">
+          <h2 class="focus-title">Focus on code,<br><span class="text-grad">not chaos.</span></h2>
+          <p class="focus-sub">Developers love Execora because it stays out of their way. GitHub &amp; GitLab integrations mean you can update status directly from your commit messages.</p>
+          <div class="focus-checks">
+            <div><v-icon color="primary" size="16" class="mr-2">mdi-check</v-icon>Two-way Git synchronization</div>
+            <div><v-icon color="primary" size="16" class="mr-2">mdi-check</v-icon>Automated CI/CD workflows</div>
+            <div><v-icon color="primary" size="16" class="mr-2">mdi-check</v-icon>Smart commit linking</div>
+          </div>
+        </div>
+        <div class="focus-right">
+          <div class="code-block">
+            <div class="code-line"><span class="c-pink">git</span> commit -m <span class="c-green">"feat: add login page #PROJ-123"</span></div>
+            <div class="code-line c-grey">PROJ-123 moved to In Progress</div>
+            <div class="code-line"><span class="c-blue">➜</span> <span class="c-cyan">my-app</span> <span class="c-amber">git:(main)</span> <span class="c-green">✔</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-section">
+      <div class="cta-card">
+        <div class="cta-rocket">
+          <v-icon size="260" color="white" style="opacity:.12">mdi-rocket-launch</v-icon>
+        </div>
+        <h2 class="cta-title">Ready to transform how you work?</h2>
+        <p class="cta-sub">Join thousands of high-performing teams using Execora today.</p>
+        <v-btn size="small" variant="flat" color="white" class="text-primary text-none font-weight-bold px-6 rounded-lg" to="/board">
+          Start Your Free Trial
+        </v-btn>
+        <p class="cta-note">14-day free trial. No credit card required.</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-section">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="d-flex align-center gap-2 mb-3">
+            <v-avatar color="primary" size="26" rounded="lg">
+              <v-icon color="white" size="14">mdi-checkbox-marked-circle-outline</v-icon>
+            </v-avatar>
+            <span class="brand">Execora</span>
+          </div>
+          <p class="footer-desc">Empowering teams to achieve greatness through better collaboration and organization.</p>
+          <div class="d-flex gap-2 mt-3">
+            <v-btn icon size="x-small" variant="tonal" rounded="lg"><v-icon size="14">mdi-twitter</v-icon></v-btn>
+            <v-btn icon size="x-small" variant="tonal" rounded="lg"><v-icon size="14">mdi-linkedin</v-icon></v-btn>
+            <v-btn icon size="x-small" variant="tonal" rounded="lg"><v-icon size="14">mdi-github</v-icon></v-btn>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Product</div>
+          <a href="#" class="footer-link">Features</a>
+          <a href="#" class="footer-link">Security</a>
+          <a href="#" class="footer-link">Enterprise</a>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title">Resources</div>
+          <a href="#" class="footer-link">Documentation</a>
+          <a href="#" class="footer-link">API</a>
+          <a href="#" class="footer-link">Community</a>
+          <a href="#" class="footer-link">Blog</a>
+        </div>
+
+        <div class="footer-col footer-col-wide">
+          <div class="footer-col-title">Stay up to date</div>
+          <div class="footer-email-row">
+            <input type="email" placeholder="Enter your email" class="footer-email-input" />
+            <button class="footer-subscribe-btn">Subscribe</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 MyTask Inc. All rights reserved.</span>
+        <div class="d-flex gap-4">
+          <a href="#" class="footer-link">Privacy Policy</a>
+          <a href="#" class="footer-link">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -356,156 +249,464 @@
 </script>
 
 <style scoped>
-.landing-page {
-  background-color: rgb(var(--v-theme-background));
-  overflow-x: hidden;
+/* ── Base ── */
+.landing {
   font-family: 'Inter', sans-serif;
-  /* Assuming Inter is available or via vuetify config */
+  font-size: 13px;
+  color: #1e293b;
+  background: #fff;
+  overflow-x: hidden;
 }
 
+/* ── Navbar ── */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #f1f5f9;
+}
+.navbar-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand {
+  font-size: 15px;
+  font-weight: 700;
+  color: #4f46e5;
+}
+.nav-link {
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  text-decoration: none;
+}
+.nav-link:hover { color: #4f46e5; }
+
+/* ── Hero ── */
 .hero-section {
-  min-height: 100vh;
-  padding-top: 100px;
+  position: relative;
+  background: linear-gradient(160deg, #eef2ff 0%, #f8faff 50%, #ffffff 100%);
+  padding: 64px 24px 80px;
+  overflow: hidden;
 }
-
-/* Background Shapes */
-.bg-shape-1 {
+.hero-bg-blob {
   position: absolute;
-  top: -20%;
-  right: -10%;
-  width: 800px;
-  height: 800px;
-  background: radial-gradient(circle, rgba(0, 82, 204, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+  top: -100px; right: -100px;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(99,102,241,0.10) 0%, transparent 70%);
   border-radius: 50%;
-  z-index: 0;
-  animation: pulse 10s infinite alternate;
+  pointer-events: none;
 }
-
-.bg-shape-2 {
-  position: absolute;
-  bottom: -10%;
-  left: -10%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(54, 179, 126, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
-  border-radius: 50%;
-  z-index: 0;
-  animation: pulse 8s infinite alternate-reverse;
+.hero-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 48px;
 }
+.hero-left { flex: 0 0 340px; }
+.hero-right { flex: 1; position: relative; }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-  }
-
-  100% {
-    transform: scale(1.1);
-  }
-}
-
-.text-gradient {
-  background: linear-gradient(120deg, rgb(var(--v-theme-primary)), #36b37e);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+.hero-badge {
   display: inline-block;
+  background: #eff6ff;
+  color: #4f46e5;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+.hero-title {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+.text-grad {
+  background: linear-gradient(120deg, #4f46e5, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 12.5px;
+  color: #64748b;
+  line-height: 1.65;
+  margin: 0;
+}
+.hero-checks {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+  font-size: 11.5px;
+  color: #64748b;
+  align-items: center;
 }
 
-.leading-tight {
-  line-height: 1.15;
+/* ── Mockup ── */
+.mockup-card {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+  overflow: hidden;
+  transform: perspective(800px) rotateY(-6deg) rotateX(3deg);
+  transition: transform .4s ease;
+}
+.mockup-card:hover {
+  transform: perspective(800px) rotateY(0deg) rotateX(0deg);
+}
+.mockup-chrome {
+  background: #f1f5f9;
+  padding: 8px 12px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  border-bottom: 1px solid #e2e8f0;
+}
+.dot { width: 9px; height: 9px; border-radius: 50%; }
+.dot-red    { background: #ef4444; }
+.dot-yellow { background: #f59e0b; }
+.dot-green  { background: #10b981; }
+.mockup-body {
+  display: flex;
+  background: #f8fafc;
+  padding: 10px;
+  gap: 10px;
+  min-height: 130px;
+}
+.mockup-sidebar {
+  width: 44px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid #f1f5f9;
+}
+.mock-block { border-radius: 4px; height: 18px; }
+.primary-block { background: #4f46e5; }
+.grey-block { background: #e2e8f0; }
+.mockup-cols { display: flex; gap: 8px; flex: 1; }
+.mock-col {
+  flex: 1;
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.mock-col-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: .05em;
+  margin-bottom: 2px;
+}
+.mock-task {
+  background: #f8fafc;
+  border-radius: 4px;
+  height: 28px;
+  border: 1px solid #f1f5f9;
+}
+.border-primary-l { border-left: 3px solid #4f46e5 !important; }
+.border-warning-l  { border-left: 3px solid #f59e0b !important; }
+.border-success-l  { border-left: 3px solid #10b981 !important; }
+
+/* floating badges */
+.float-badge {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  min-width: 150px;
+}
+.float-badge-1 { bottom: -16px; right: 0; animation: floatY 5s ease-in-out infinite; }
+.float-badge-2 { top: 16px; left: -16px; animation: floatY 6s ease-in-out infinite 1s; }
+.badge-title { font-size: 11px; font-weight: 600; color: #0f172a; }
+.badge-sub   { font-size: 10.5px; color: #64748b; }
+
+@keyframes floatY {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
 }
 
-.leading-loose {
+/* ── Trusted ── */
+.trusted-section {
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 28px 24px;
+  text-align: center;
+}
+.trusted-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+.trusted-logos {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+.trusted-logos span {
+  font-size: 14px;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: .02em;
+}
+
+/* ── Features ── */
+.features-section {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 64px 24px;
+}
+.section-center { text-align: center; margin-bottom: 40px; }
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+.section-sub {
+  font-size: 12.5px;
+  color: #64748b;
+  max-width: 480px;
+  margin: 0 auto;
   line-height: 1.6;
 }
-
-.tracking-wide {
-  letter-spacing: 0.1em;
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 }
-
-.glass-card {
-  backdrop-filter: blur(12px);
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
-/* 3D Transform for Hero Dashboard */
-.perspective-container {
-  perspective: 1000px;
-}
-
-.hero-dashboard {
-  transform: rotateY(-10deg) rotateX(5deg);
-  transition: transform 0.5s ease;
-  box-shadow: 20px 20px 60px rgba(0, 0, 0, 0.1);
-}
-
-.hero-dashboard:hover {
-  transform: rotateY(0deg) rotateX(0deg);
-}
-
-/* Floating Animations */
-.floating-card-1 {
-  animation: float 6s ease-in-out infinite;
-}
-
-.floating-card-2 {
-  animation: float 7s ease-in-out infinite;
-  animation-delay: 1s;
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-20px);
-  }
-
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-/* Feature Cards */
 .feature-card {
-  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 24px 20px;
+  transition: transform .2s, box-shadow .2s;
 }
-
 .feature-card:hover {
-  transform: translateY(-8px);
-  border-color: rgb(var(--v-theme-primary));
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.07);
+  border-color: #c7d2fe;
+}
+.feature-icon {
+  width: 44px; height: 44px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px;
+}
+.feature-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+.feature-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
 }
 
-.button-glow:hover {
-  box-shadow: 0 0 20px rgba(0, 82, 204, 0.4);
+/* ── Focus ── */
+.focus-section {
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 64px 24px;
+}
+.focus-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 56px;
+}
+.focus-left { flex: 1; }
+.focus-right { flex: 1; }
+.focus-title {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: #0f172a;
+  margin-bottom: 14px;
+}
+.focus-sub {
+  font-size: 12.5px;
+  color: #64748b;
+  line-height: 1.65;
+  margin-bottom: 20px;
+}
+.focus-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #1e293b;
+}
+.code-block {
+  background: #1e293b;
+  border-radius: 10px;
+  padding: 20px 22px;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.code-line { white-space: pre-wrap; }
+.c-pink  { color: #f472b6; }
+.c-green { color: #4ade80; }
+.c-grey  { color: #94a3b8; }
+.c-blue  { color: #60a5fa; }
+.c-cyan  { color: #22d3ee; }
+.c-amber { color: #fbbf24; }
+
+/* ── CTA ── */
+.cta-section {
+  padding: 48px 24px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+.cta-card {
+  background: #4f46e5;
+  border-radius: 14px;
+  padding: 56px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.cta-rocket {
+  position: absolute;
+  top: -40px; right: -40px;
+  pointer-events: none;
+}
+.cta-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 10px;
+}
+.cta-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,.85);
+  margin-bottom: 24px;
+}
+.cta-note {
+  font-size: 11px;
+  color: rgba(255,255,255,.6);
+  margin-top: 12px;
+  margin-bottom: 0;
 }
 
-.hover-primary:hover {
-  color: rgb(var(--v-theme-primary)) !important;
+/* ── Footer ── */
+.footer-section {
+  background: #fff;
+  border-top: 1px solid #f1f5f9;
+  padding: 48px 24px 24px;
+}
+.footer-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 2fr;
+  gap: 32px;
+  padding-bottom: 32px;
+}
+.footer-brand {}
+.footer-desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.6;
+  max-width: 220px;
+  margin: 0;
+}
+.footer-col { display: flex; flex-direction: column; gap: 8px; }
+.footer-col-wide {}
+.footer-col-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 4px;
+}
+.footer-link {
+  font-size: 12px;
+  color: #64748b;
+  text-decoration: none;
+}
+.footer-link:hover { color: #4f46e5; }
+.footer-email-row {
+  display: flex;
+  gap: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.footer-email-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  color: #1e293b;
+  background: #f8fafc;
+}
+.footer-subscribe-btn {
+  background: #4f46e5;
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.footer-subscribe-btn:hover { background: #4338ca; }
+.footer-bottom {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  color: #94a3b8;
 }
 
-.grayscale {
-  filter: grayscale(100%);
-  transition: filter 0.3s;
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .hero-inner { flex-direction: column; }
+  .hero-left { flex: unset; }
+  .hero-right { display: none; }
+  .features-grid { grid-template-columns: 1fr; }
+  .focus-inner { flex-direction: column; }
+  .footer-inner { grid-template-columns: 1fr 1fr; }
 }
 
-.grayscale:hover {
-  filter: grayscale(0%);
-  opacity: 1 !important;
-}
-
-.gap-2 {
-  gap: 8px;
-}
-
-.gap-3 {
-  gap: 12px;
-}
-
-.gap-4 {
-  gap: 16px;
-}
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
 </style>

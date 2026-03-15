@@ -4,7 +4,7 @@ import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 // Our overrides — must come after vuetify/styles to win the cascade
-import '@/styles/settings.scss'
+// import '@/styles/settings.scss'
 
 
 export default createVuetify({
