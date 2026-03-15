@@ -4,7 +4,7 @@ import * as directives from 'vuetify/directives'
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 // Our overrides — must come after vuetify/styles to win the cascade
-// import '@/styles/settings.scss'
+//  import '@/styles/settings.scss'
 
 
 export default createVuetify({
@@ -50,7 +50,7 @@ export default createVuetify({
   defaults: {
     VBtn: {
       variant: 'flat',
-      style: 'text-transform: none; letter-spacing: normal; font-weight: 500;',
+      style: 'text-transform: none; letter-spacing: normal; font-weight: 500; font-size: 12.5px;',
     },
     VCard: {
       elevation: 0,

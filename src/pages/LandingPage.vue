@@ -35,13 +35,20 @@
           <p class="hero-sub">
             The only project management tool you need to plan, track, and release world-class software with zero friction.
           </p>
-          <div class="d-flex align-center gap-3 mt-6">
-            <v-btn color="primary" size="small" rounded="lg" class="text-none font-weight-medium px-5" to="/board" elevation="2">
+          <div class="hero-cta-row">
+            <a href="/board" class="btn-primary-hero">
               Get Started Free
-            </v-btn>
-            <v-btn variant="outlined" color="secondary" size="small" rounded="lg" class="text-none font-weight-medium px-5">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <v-button class="btn-outline-hero">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+                <polygon points="10,8 16,12 10,16" fill="currentColor"/>
+              </svg>
               View Demo
-            </v-btn>
+            </v-button>
           </div>
           <div class="hero-checks">
             <span><v-icon color="success" size="14" class="mr-1">mdi-check-circle</v-icon>No credit card required</span>
@@ -112,13 +119,22 @@
 
     <!-- Trusted by -->
     <div class="trusted-section">
-      <div class="trusted-label">WEB APPLICATIONS</div>
-      <div class="trusted-logos">
-        <span>Aliceblue</span>
-        <span>Rise</span>
-        <span>BOT</span>
-        <span>EKYC</span>
-        <span>ANT</span>
+      <p class="trusted-label">TRUSTED BY TEAMS AT</p>
+      <div class="trusted-track-wrap">
+        <div class="trusted-track">
+          <div v-for="logo in [...trustedLogos, ...trustedLogos]" :key="logo.name + Math.random()" class="trusted-logo-item">
+            <div class="trusted-logo-icon" :style="{ background: logo.bg }">
+              <v-icon :color="logo.color" size="18">{{ logo.icon }}</v-icon>
+            </div>
+            <span class="trusted-logo-name">{{ logo.name }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="trusted-stats">
+        <div v-for="s in trustedStats" :key="s.label" class="trusted-stat">
+          <div class="trusted-stat-value">{{ s.value }}</div>
+          <div class="trusted-stat-label">{{ s.label }}</div>
+        </div>
       </div>
     </div>
 
@@ -245,7 +261,22 @@
 </template>
 
 <script lang="ts" setup>
-// Landing page
+const trustedLogos = [
+  { name: 'Aliceblue',  icon: 'mdi-water',              color: '#3b82f6', bg: '#eff6ff' },
+  { name: 'Rise',       icon: 'mdi-trending-up',         color: '#10b981', bg: '#f0fdf4' },
+  { name: 'BOT',        icon: 'mdi-robot-outline',       color: '#8b5cf6', bg: '#f5f3ff' },
+  { name: 'EKYC',       icon: 'mdi-shield-check-outline',color: '#f59e0b', bg: '#fffbeb' },
+  { name: 'ANT',        icon: 'mdi-hexagon-outline',     color: '#ef4444', bg: '#fef2f2' },
+  { name: 'Fincommunity',      icon: 'mdi-atom',                color: '#06b6d4', bg: '#ecfeff' },
+  { name: 'Voice Blaster',      icon: 'mdi-orbit',               color: '#4f46e5', bg: '#eef2ff' },
+]
+
+const trustedStats = [
+  { value: '1,00+', label: 'Branch' },
+  { value: '2M+',     label: 'Tasks completed' },
+  { value: '99.9%',   label: 'Uptime SLA' },
+  { value: '4.9 ★',   label: 'Average rating' },
+]
 </script>
 
 <style scoped>
@@ -342,14 +373,29 @@
   line-height: 1.65;
   margin: 0;
 }
-.hero-checks {
-  display: flex;
-  gap: 16px;
-  margin-top: 14px;
-  font-size: 11.5px;
-  color: #64748b;
-  align-items: center;
+/* ── Hero CTA buttons ── */
+.hero-cta-row {
+  display: flex; align-items: center; gap: 12px; margin-top: 24px;
 }
+.btn-primary-hero {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 26px; border-radius: 10px;
+  background: #4f46e5; color: #fff;
+  font-size: 14.5px; font-weight: 700; font-family: 'Inter', sans-serif;
+  text-decoration: none; border: none; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(79,70,229,0.38);
+  transition: background .15s, box-shadow .15s, transform .1s;
+}
+.btn-primary-hero:hover { background: #4338ca; box-shadow: 0 6px 22px rgba(79,70,229,0.45); transform: translateY(-1px); }
+.btn-outline-hero {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 22px; border-radius: 10px;
+  background: #fff; color: #374151;
+  font-size: 14.5px; font-weight: 600; font-family: 'Inter', sans-serif;
+  border: 1.5px solid #e2e8f0; cursor: pointer;
+  transition: border-color .15s, background .15s, transform .1s;
+}
+.btn-outline-hero:hover { border-color: #a5b4fc; background: #f8fafc; transform: translateY(-1px); }
 
 /* ── Mockup ── */
 .mockup-card {
@@ -451,27 +497,78 @@
   background: #f8fafc;
   border-top: 1px solid #f1f5f9;
   border-bottom: 1px solid #f1f5f9;
-  padding: 28px 24px;
+  padding: 48px 24px 40px;
   text-align: center;
+  overflow: hidden;
 }
 .trusted-label {
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 700;
-  letter-spacing: .1em;
+  letter-spacing: .12em;
   color: #94a3b8;
-  margin-bottom: 16px;
+  margin-bottom: 28px;
 }
-.trusted-logos {
+
+/* Scrolling marquee */
+.trusted-track-wrap {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
+  margin-bottom: 40px;
+}
+.trusted-track {
   display: flex;
-  justify-content: center;
-  gap: 48px;
-  flex-wrap: wrap;
+  gap: 20px;
+  width: max-content;
+  animation: marquee 28s linear infinite;
 }
-.trusted-logos span {
-  font-size: 14px;
-  font-weight: 800;
-  color: #94a3b8;
-  letter-spacing: .02em;
+.trusted-track:hover { animation-play-state: paused; }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.trusted-logo-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px; border-radius: 12px;
+  background: #fff; border: 1px solid #e2e8f0;
+  white-space: nowrap;
+  transition: border-color .2s, box-shadow .2s;
+  cursor: default;
+}
+.trusted-logo-item:hover {
+  border-color: #c7d2fe;
+  box-shadow: 0 4px 12px rgba(79,70,229,0.08);
+}
+.trusted-logo-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.trusted-logo-name {
+  font-size: 13.5px; font-weight: 700; color: #374151; letter-spacing: -.01em;
+}
+
+/* Stats row */
+.trusted-stats {
+  display: flex; justify-content: center; gap: 0;
+  border: 1px solid #e2e8f0; border-radius: 14px;
+  background: #fff; overflow: hidden;
+  max-width: 680px; margin: 0 auto;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+}
+.trusted-stat {
+  flex: 1; padding: 20px 16px; text-align: center;
+  border-right: 1px solid #f1f5f9;
+}
+.trusted-stat:last-child { border-right: none; }
+.trusted-stat-value {
+  font-size: 22px; font-weight: 900; color: #4f46e5;
+  letter-spacing: -.03em; line-height: 1.1; margin-bottom: 4px;
+}
+.trusted-stat-label {
+  font-size: 11.5px; color: #94a3b8; font-weight: 500;
 }
 
 /* ── Features ── */
@@ -633,7 +730,7 @@
   gap: 32px;
   padding-bottom: 32px;
 }
-.footer-brand {}
+.footer-brand { display: block; }
 .footer-desc {
   font-size: 12px;
   color: #64748b;
@@ -642,7 +739,7 @@
   margin: 0;
 }
 .footer-col { display: flex; flex-direction: column; gap: 8px; }
-.footer-col-wide {}
+.footer-col-wide { display: flex; flex-direction: column; gap: 8px; }
 .footer-col-title {
   font-size: 12.5px;
   font-weight: 700;
