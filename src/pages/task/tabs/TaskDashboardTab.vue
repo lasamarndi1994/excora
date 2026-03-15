@@ -1,287 +1,218 @@
 <template>
-  <div class="overflow-y-auto h-100">
-    <div class="pa-4">
+  <div class="tdash-root">
 
-      <!-- Top bar -->
-      <div class="d-flex align-center justify-space-between mb-4">
-        <v-btn size="small" variant="outlined" prepend-icon="mdi-plus"
-          class="text-none font-weight-medium text-medium-emphasis" color="medium-emphasis">
-          Add widget
-        </v-btn>
-        <v-btn size="small" variant="text" class="text-none text-medium-emphasis">
-          Send feedback
-        </v-btn>
+    <!-- Stat cards -->
+    <div class="stat-row">
+      <div v-for="(s, i) in stats" :key="s.label" class="stat-card" :style="{ animationDelay: i * 60 + 'ms' }">
+        <div class="sc-icon" :style="{ background: s.iconBg }">
+          <v-icon size="18" :color="s.iconColor">{{ s.icon }}</v-icon>
+        </div>
+        <div class="sc-val">{{ s.value }}</div>
+        <div class="sc-label">{{ s.label }}</div>
+        <div class="sc-bar"><div class="sc-bar-fill" :style="{ width: s.pct + '%', background: s.iconColor }"></div></div>
+      </div>
+    </div>
+
+    <!-- Charts row 1 -->
+    <div class="charts-row">
+      <!-- Bar: tasks by section -->
+      <div class="chart-card">
+        <div class="cc-head">
+          <span class="cc-title">Tasks by section</span>
+          <span class="cc-filter"><v-icon size="12">mdi-filter-outline</v-icon> 1 Filter</span>
+        </div>
+        <div class="bar-chart">
+          <div v-for="bar in sectionBars" :key="bar.label" class="bar-item">
+            <span class="bar-val">{{ bar.count || '' }}</span>
+            <div class="bar-col-wrap">
+              <div class="bar-fill"
+                :style="{ height: bar.count ? (bar.count / maxSection * 100) + '%' : '3px',
+                          background: bar.count ? '#818cf8' : '#e2e8f0' }">
+              </div>
+            </div>
+            <span class="bar-lbl">{{ bar.label }}</span>
+          </div>
+        </div>
       </div>
 
-      <!-- Stat cards -->
-      <v-row class="mb-4" dense>
-        <v-col v-for="stat in statCards" :key="stat.label" cols="6" md="3">
-          <v-card class="stat-card pa-5 d-flex flex-column align-center text-center" border elevation="0">
-            <div class="text-body-2 text-medium-emphasis mb-3">{{ stat.label }}</div>
-            <div class="stat-number font-weight-light mb-3">{{ stat.value }}</div>
-            <div class="d-flex align-center gap-1 text-caption text-medium-emphasis">
-              <v-icon size="13">mdi-filter-outline</v-icon>
-              {{ stat.filter }}
+      <!-- Donut: completion status -->
+      <div class="chart-card">
+        <div class="cc-head">
+          <span class="cc-title">Completion status</span>
+          <span class="cc-filter"><v-icon size="12">mdi-filter-outline</v-icon> 2 Filters</span>
+        </div>
+        <div class="donut-wrap">
+          <div class="donut-svg-wrap">
+            <svg viewBox="0 0 36 36" width="120" height="120">
+              <circle cx="18" cy="18" r="14" fill="none" stroke="#f1f5f9" stroke-width="5"/>
+              <circle cx="18" cy="18" r="14" fill="none" stroke="#818cf8" stroke-width="5"
+                :stroke-dasharray="`${completionPct} ${100 - completionPct}`"
+                stroke-dashoffset="25" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-center">{{ completionTotal }}</div>
+          </div>
+          <div class="donut-legend">
+            <div v-for="seg in completionSegs" :key="seg.label" class="dl-row">
+              <span class="dl-dot" :style="{ background: seg.color }"></span>
+              <span class="dl-lbl">{{ seg.label }}</span>
+              <span class="dl-val">{{ seg.value }}</span>
             </div>
-          </v-card>
-        </v-col>
-      </v-row>
+          </div>
+        </div>
+      </div>
 
-      <!-- Charts row 1 -->
-      <v-row class="mb-4" dense>
-        <!-- Total tasks by section -->
-        <v-col cols="12" md="6">
-          <v-card border elevation="0" class="pa-4">
-            <div class="text-body-2 font-weight-medium mb-4">Total tasks by section</div>
-            <div class="chart-area d-flex align-end gap-3 px-2 pb-2" style="height:160px">
-              <div v-for="bar in sectionBars" :key="bar.label"
-                class="d-flex flex-column align-center flex-grow-1 gap-1">
-                <span class="text-caption text-medium-emphasis">{{ bar.count || '' }}</span>
-                <div class="bar-col rounded-t"
-                  :style="{
-                    height: bar.count ? (bar.count / maxSectionCount * 120) + 'px' : '3px',
-                    background: bar.count ? '#a5b4fc' : '#e2e8f0',
-                    width: '100%'
-                  }"></div>
-                <span class="text-caption text-medium-emphasis text-truncate" style="max-width:56px;font-size:10px">
-                  {{ bar.label }}
-                </span>
+      <!-- Bar: tasks by project -->
+      <div class="chart-card">
+        <div class="cc-head">
+          <span class="cc-title">Tasks by project</span>
+          <span class="cc-filter"><v-icon size="12">mdi-filter-outline</v-icon> No Filters</span>
+        </div>
+        <div class="bar-chart">
+          <div v-for="bar in projectBars" :key="bar.label" class="bar-item">
+            <span class="bar-val">{{ bar.count }}</span>
+            <div class="bar-col-wrap">
+              <div class="bar-fill"
+                :style="{ height: (bar.count / maxProject * 100) + '%',
+                          background: 'linear-gradient(180deg,#6366f1,#a5b4fc)' }">
               </div>
             </div>
-            <v-divider class="my-3" />
-            <div class="d-flex align-center justify-space-between">
-              <div class="d-flex align-center gap-1 text-caption text-medium-emphasis">
-                <v-icon size="13">mdi-filter-outline</v-icon> 1 Filter
-              </div>
-              <v-btn size="x-small" variant="text" class="text-none text-medium-emphasis">See all</v-btn>
-            </div>
-          </v-card>
-        </v-col>
-
-        <!-- Tasks by completion status (donut) -->
-        <v-col cols="12" md="6">
-          <v-card border elevation="0" class="pa-4">
-            <div class="text-body-2 font-weight-medium mb-4">Tasks by completion status this upcoming month</div>
-            <div class="d-flex align-center justify-center" style="height:160px">
-              <div style="position:relative;width:130px;height:130px;flex-shrink:0">
-                <svg viewBox="0 0 36 36" width="130" height="130">
-                  <circle cx="18" cy="18" r="14" fill="none" stroke="#e2e8f0" stroke-width="5" />
-                  <circle v-if="completionTotal > 0" cx="18" cy="18" r="14" fill="none"
-                    stroke="#a5b4fc" stroke-width="5"
-                    :stroke-dasharray="`${completionPct} ${100 - completionPct}`"
-                    stroke-dashoffset="25" stroke-linecap="round" />
-                </svg>
-                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
-                  <span class="text-h6 font-weight-light text-medium-emphasis">{{ completionTotal }}</span>
-                </div>
-              </div>
-              <div class="ml-6 d-flex flex-column gap-2">
-                <div v-for="seg in completionSegments" :key="seg.label" class="d-flex align-center gap-2">
-                  <div class="rounded-sm" :style="{ width:'10px', height:'10px', background: seg.color }"></div>
-                  <span class="text-caption text-medium-emphasis">{{ seg.label }}</span>
-                  <span class="text-caption font-weight-bold ml-auto pl-4">{{ seg.value }}</span>
-                </div>
-              </div>
-            </div>
-            <v-divider class="my-3" />
-            <div class="d-flex align-center justify-space-between">
-              <div class="d-flex align-center gap-1 text-caption text-medium-emphasis">
-                <v-icon size="13">mdi-filter-outline</v-icon> 2 Filters
-              </div>
-              <v-btn size="x-small" variant="text" class="text-none text-medium-emphasis">See all</v-btn>
-            </div>
-          </v-card>
-        </v-col>
-      </v-row>
-
-      <!-- Charts row 2 -->
-      <v-row dense>
-        <!-- Total tasks by project -->
-        <v-col cols="12" md="6">
-          <v-card border elevation="0" class="pa-4">
-            <div class="text-body-2 font-weight-medium mb-3">Total tasks by project</div>
-            <div class="d-flex" style="height:160px">
-              <!-- Y-axis -->
-              <div class="d-flex flex-column justify-space-between text-right pr-2 pb-5 flex-shrink-0" style="width:28px">
-                <span style="font-size:9px" class="text-disabled">{{ maxProjectCount }}</span>
-                <span style="font-size:9px" class="text-disabled">{{ Math.round(maxProjectCount / 2) }}</span>
-                <span style="font-size:9px" class="text-disabled">0</span>
-              </div>
-              <!-- Bars -->
-              <div class="flex-grow-1 d-flex flex-column">
-                <div class="flex-grow-1 d-flex align-end gap-3 px-1"
-                  style="border-left:1px solid #e2e8f0; border-bottom:1px solid #e2e8f0;">
-                  <div v-for="bar in projectBars" :key="bar.label"
-                    class="d-flex flex-column align-center flex-grow-1 gap-1">
-                    <span style="font-size:10px" class="text-medium-emphasis font-weight-medium">{{ bar.count }}</span>
-                    <div class="rounded-t w-100"
-                      :style="{
-                        height: bar.count ? (bar.count / maxProjectCount * 100) + '%' : '3px',
-                        background: 'linear-gradient(180deg,#818cf8,#a5b4fc)',
-                        minHeight: bar.count ? '8px' : '3px'
-                      }"></div>
-                  </div>
-                </div>
-                <div class="d-flex gap-3 px-1 mt-1">
-                  <div v-for="bar in projectBars" :key="bar.label"
-                    class="flex-grow-1 text-center text-truncate"
-                    style="font-size:10px; color:#94a3b8; max-width:80px">
-                    {{ bar.label }}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <v-divider class="my-3" />
-            <div class="d-flex align-center justify-space-between">
-              <div class="d-flex align-center gap-1 text-caption text-medium-emphasis">
-                <v-icon size="13">mdi-filter-outline</v-icon> No Filters
-              </div>
-              <v-btn size="x-small" variant="text" class="text-none text-medium-emphasis">See all</v-btn>
-            </div>
-          </v-card>
-        </v-col>
-
-        <!-- Task completion over time -->
-        <v-col cols="12" md="6">
-          <v-card border elevation="0" class="pa-4">
-            <div class="text-body-2 font-weight-medium mb-3">Task completion over time</div>
-            <div class="d-flex" style="height:160px">
-              <!-- Y-axis -->
-              <div class="d-flex flex-column justify-space-between text-right pr-2 pb-5 flex-shrink-0" style="width:20px">
-                <span style="font-size:9px" class="text-disabled">{{ maxV }}</span>
-                <span style="font-size:9px" class="text-disabled">{{ Math.round(maxV / 2) }}</span>
-                <span style="font-size:9px" class="text-disabled">0</span>
-              </div>
-              <!-- SVG chart -->
-              <div class="flex-grow-1 d-flex flex-column min-width-0">
-                <div class="flex-grow-1 position-relative"
-                  style="border-left:1px solid #e2e8f0; border-bottom:1px solid #e2e8f0; overflow:hidden">
-                  <svg width="100%" height="100%" preserveAspectRatio="none"
-                    :viewBox="`0 0 ${svgW} ${svgH}`">
-                    <line x1="0" :y1="svgH*0.25" :x2="svgW" :y2="svgH*0.25" stroke="#f1f5f9" stroke-width="1"/>
-                    <line x1="0" :y1="svgH*0.5"  :x2="svgW" :y2="svgH*0.5"  stroke="#f1f5f9" stroke-width="1"/>
-                    <line x1="0" :y1="svgH*0.75" :x2="svgW" :y2="svgH*0.75" stroke="#f1f5f9" stroke-width="1"/>
-                    <path :d="areaPath" fill="rgba(129,140,248,0.15)"/>
-                    <path :d="linePath" fill="none" stroke="#818cf8"
-                      stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <circle v-for="(pt, i) in chartPoints" :key="i"
-                      :cx="pt.x" :cy="pt.y" r="3.5" fill="#818cf8" stroke="white" stroke-width="1.5"/>
-                  </svg>
-                </div>
-                <div class="d-flex justify-space-between mt-1">
-                  <span v-for="pt in chartPoints" :key="pt.label"
-                    style="font-size:9px; color:#94a3b8; flex:1; text-align:center">
-                    {{ pt.label }}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <v-divider class="my-3" />
-            <div class="d-flex align-center justify-space-between">
-              <div class="d-flex align-center gap-1 text-caption text-medium-emphasis">
-                <v-icon size="13">mdi-filter-outline</v-icon> 1 Filter
-              </div>
-              <v-btn size="x-small" variant="text" class="text-none text-medium-emphasis">See all</v-btn>
-            </div>
-          </v-card>
-        </v-col>
-      </v-row>
-
+            <span class="bar-lbl">{{ bar.label }}</span>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Line chart: completion over time -->
+    <div class="chart-card chart-card--wide">
+      <div class="cc-head">
+        <span class="cc-title">Task completion over time</span>
+        <span class="cc-filter"><v-icon size="12">mdi-filter-outline</v-icon> 1 Filter</span>
+      </div>
+      <svg class="line-svg" viewBox="0 0 600 100" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#818cf8" stop-opacity=".25"/>
+            <stop offset="100%" stop-color="#818cf8" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path :d="areaPath" fill="url(#areaGrad)"/>
+        <path :d="linePath" fill="none" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle v-for="(pt, i) in chartPts" :key="i" :cx="pt.x" :cy="pt.y" r="4" fill="#818cf8" stroke="white" stroke-width="1.5"/>
+      </svg>
+      <div class="line-labels">
+        <span v-for="pt in chartPts" :key="pt.label">{{ pt.label }}</span>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 
-const statCards = [
-  { label: 'Total completed tasks', value: 7,  filter: '1 Filter' },
-  { label: 'Total incomplete tasks', value: 4,  filter: '1 Filter' },
-  { label: 'Total overdue tasks',    value: 3,  filter: '1 Filter' },
-  { label: 'Total tasks',            value: 11, filter: 'No Filters' },
+const stats = [
+  { label: 'Completed',  value: 7,  pct: 64,  icon: 'mdi-check-circle-outline', iconBg: '#f0fdf4', iconColor: '#10b981' },
+  { label: 'Incomplete', value: 4,  pct: 36,  icon: 'mdi-circle-half-full',     iconBg: '#eff6ff', iconColor: '#3b82f6' },
+  { label: 'Overdue',    value: 3,  pct: 27,  icon: 'mdi-clock-alert-outline',  iconBg: '#fef2f2', iconColor: '#ef4444' },
+  { label: 'Total',      value: 11, pct: 100, icon: 'mdi-format-list-checks',   iconBg: '#eef2ff', iconColor: '#6366f1' },
 ]
 
 const sectionBars = [
-  { label: 'Untitled S.', count: 0 },
-  { label: 'Untitled S.', count: 0 },
-  { label: 'Recently...',  count: 10 },
-  { label: 'Do today',    count: 0 },
-  { label: 'Do next...',  count: 0 },
-  { label: 'Do later',    count: 0 },
+  { label: 'Recent', count: 10 }, { label: 'Today', count: 0 },
+  { label: 'Next Wk', count: 0 }, { label: 'Later', count: 0 },
 ]
-const maxSectionCount = Math.max(...sectionBars.map(b => b.count), 1)
+const maxSection = Math.max(...sectionBars.map(b => b.count), 1)
 
 const projectBars = [
-  { label: 'EX Board',   count: 7 },
-  { label: 'Mobile App', count: 3 },
-  { label: 'Analytics',  count: 1 },
+  { label: 'EX Board', count: 7 }, { label: 'Mobile', count: 3 }, { label: 'Analytics', count: 1 },
 ]
-const maxProjectCount = Math.max(...projectBars.map(b => b.count), 1)
+const maxProject = Math.max(...projectBars.map(b => b.count), 1)
 
-const completionSegments = [
-  { label: 'Completed',  value: 7, color: '#a5b4fc' },
+const completionSegs = [
+  { label: 'Completed',  value: 7, color: '#818cf8' },
   { label: 'Incomplete', value: 4, color: '#e2e8f0' },
 ]
-const completionTotal = completionSegments.reduce((s, c) => s + c.value, 0)
-const completionPct   = completionTotal ? (completionSegments[0]!.value / completionTotal) * 100 : 0
+const completionTotal = completionSegs.reduce((s, c) => s + c.value, 0)
+const completionPct   = completionTotal ? (completionSegs[0]!.value / completionTotal) * 100 : 0
 
-// SVG line chart
-const svgW = 300
-const svgH = 100
-
-const rawPoints = [
-  { label: 'Mar 8',  v: 3 },
-  { label: 'Mar 10', v: 5 },
-  { label: 'Mar 12', v: 2 },
-  { label: 'Mar 14', v: 7 },
-  { label: 'Mar 16', v: 4 },
-  { label: 'Mar 18', v: 6 },
-  { label: 'Mar 20', v: 3 },
+const rawPts = [
+  { label: 'Mar 8', v: 3 }, { label: 'Mar 10', v: 5 }, { label: 'Mar 12', v: 2 },
+  { label: 'Mar 14', v: 7 }, { label: 'Mar 16', v: 4 }, { label: 'Mar 18', v: 6 }, { label: 'Mar 20', v: 3 },
 ]
+const maxV = Math.max(...rawPts.map(p => p.v), 1)
+const W = 600, H = 100
 
-const maxV = Math.max(...rawPoints.map(p => p.v), 1)
-
-const chartPoints = computed(() =>
-  rawPoints.map((pt, i, arr) => ({
-    label: pt.label,
-    v: pt.v,
-    x: Math.round((i / (arr.length - 1)) * (svgW - 10) + 5),
-    y: Math.round(svgH - (pt.v / (maxV + 1)) * (svgH - 8) - 4),
+const chartPts = computed(() =>
+  rawPts.map((p, i, arr) => ({
+    label: p.label,
+    x: Math.round((i / (arr.length - 1)) * (W - 20) + 10),
+    y: Math.round(H - (p.v / (maxV + 1)) * (H - 10) - 5),
   }))
 )
-
-const linePath = computed(() =>
-  chartPoints.value.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ')
-)
-
+const linePath = computed(() => chartPts.value.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' '))
 const areaPath = computed(() => {
-  const pts = chartPoints.value
-  return linePath.value +
-    ` L${pts[pts.length - 1]!.x},${svgH} L${pts[0]!.x},${svgH} Z`
+  const pts = chartPts.value
+  return linePath.value + ` L${pts[pts.length - 1]!.x},${H} L${pts[0]!.x},${H} Z`
 })
 </script>
 
 <style scoped>
+.tdash-root {
+  flex: 1; overflow-y: auto; padding: 16px 24px;
+  display: flex; flex-direction: column; gap: 16px;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Stat row */
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .stat-card {
-  border-radius: 12px !important;
-  transition: box-shadow 0.15s;
+  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
+  padding: 16px; display: flex; flex-direction: column; gap: 6px;
+  animation: fadeUp .25s ease both;
+  transition: box-shadow .15s, transform .15s;
 }
-.stat-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important;
+.stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); transform: translateY(-2px); }
+.sc-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
+.sc-val { font-size: 28px; font-weight: 700; color: #0f172a; line-height: 1; }
+.sc-label { font-size: 12px; color: #64748b; }
+.sc-bar { height: 4px; background: #f1f5f9; border-radius: 99px; overflow: hidden; margin-top: 4px; }
+.sc-bar-fill { height: 100%; border-radius: 99px; transition: width .6s; }
+
+/* Charts row */
+.charts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.chart-card {
+  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 16px;
 }
-.stat-number {
-  font-size: 2.4rem;
-  line-height: 1;
-  color: rgba(var(--v-theme-on-surface), 0.85);
+.chart-card--wide { grid-column: 1 / -1; }
+.cc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.cc-title { font-size: 13px; font-weight: 600; color: #0f172a; }
+.cc-filter { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #94a3b8; }
+
+/* Bar chart */
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
+.bar-item { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; height: 100%; }
+.bar-val { font-size: 11px; color: #64748b; font-weight: 600; min-height: 16px; }
+.bar-col-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+.bar-fill { width: 100%; border-radius: 4px 4px 0 0; min-height: 3px; transition: height .5s; }
+.bar-lbl { font-size: 10px; color: #94a3b8; text-align: center; }
+
+/* Donut */
+.donut-wrap { display: flex; align-items: center; gap: 16px; }
+.donut-svg-wrap { position: relative; flex-shrink: 0; }
+.donut-center {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; color: #0f172a;
 }
-.bar-col {
-  min-height: 3px;
-  transition: height 0.3s ease;
-}
-.chart-area {
-  border-left: 1px solid #f1f5f9;
-  border-bottom: 1px solid #f1f5f9;
-}
-.gap-1 { gap: 4px; }
-.gap-2 { gap: 8px; }
+.donut-legend { display: flex; flex-direction: column; gap: 8px; }
+.dl-row { display: flex; align-items: center; gap: 7px; font-size: 12px; }
+.dl-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.dl-lbl { color: #64748b; flex: 1; }
+.dl-val { font-weight: 700; color: #0f172a; }
+
+/* Line chart */
+.line-svg { width: 100%; height: 100px; display: block; }
+.line-labels { display: flex; justify-content: space-between; margin-top: 6px; }
+.line-labels span { font-size: 9px; color: #94a3b8; flex: 1; text-align: center; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 </style>
