@@ -24,6 +24,11 @@ const router = createRouter({
           name: 'Login',
           component: () => import('@/pages/auth/LoginPage.vue'),
         },
+        {
+          path: 'auth/forgot-password',
+          name: 'ForgotPassword',
+          component: () => import('@/pages/auth/ForgotPasswordPage.vue'),
+        },
       ],
     },
     {
