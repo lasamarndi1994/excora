@@ -36,19 +36,23 @@
             The only project management tool you need to plan, track, and release world-class software with zero friction.
           </p>
           <div class="hero-cta-row">
-            <a href="/board" class="btn-primary-hero">
+            <v-btn
+              color="primary" size="large" rounded="lg"
+              class="text-none font-weight-bold btn-primary-hero"
+              append-icon="mdi-arrow-right"
+              to="/board"
+              style="white-space: nowrap;"
+            >
               Get Started Free
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </a>
-            <v-button class="btn-outline-hero">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
-                <polygon points="10,8 16,12 10,16" fill="currentColor"/>
-              </svg>
+            </v-btn>
+            <v-btn
+              variant="outlined" size="large" rounded="lg"
+              class="text-none font-weight-semibold"
+              prepend-icon="mdi-play-circle-outline"
+              style="white-space: nowrap;"
+            >
               View Demo
-            </v-button>
+            </v-btn>
           </div>
           <div class="hero-checks">
             <span><v-icon color="success" size="14" class="mr-1">mdi-check-circle</v-icon>No credit card required</span>
@@ -378,24 +382,8 @@ const trustedStats = [
   display: flex; align-items: center; gap: 12px; margin-top: 24px;
 }
 .btn-primary-hero {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 13px 26px; border-radius: 10px;
-  background: #4f46e5; color: #fff;
-  font-size: 14.5px; font-weight: 700; font-family: 'Inter', sans-serif;
-  text-decoration: none; border: none; cursor: pointer;
-  box-shadow: 0 4px 16px rgba(79,70,229,0.38);
-  transition: background .15s, box-shadow .15s, transform .1s;
+  box-shadow: 0 4px 16px rgba(79,70,229,0.38) !important;
 }
-.btn-primary-hero:hover { background: #4338ca; box-shadow: 0 6px 22px rgba(79,70,229,0.45); transform: translateY(-1px); }
-.btn-outline-hero {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 13px 22px; border-radius: 10px;
-  background: #fff; color: #374151;
-  font-size: 14.5px; font-weight: 600; font-family: 'Inter', sans-serif;
-  border: 1.5px solid #e2e8f0; cursor: pointer;
-  transition: border-color .15s, background .15s, transform .1s;
-}
-.btn-outline-hero:hover { border-color: #a5b4fc; background: #f8fafc; transform: translateY(-1px); }
 
 /* ── Mockup ── */
 .mockup-card {
