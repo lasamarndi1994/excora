@@ -45,11 +45,7 @@ const router = createRouter({
           name: 'Sprint',
           component: () => import('@/pages/sprint/SprintPage.vue'),
         },
-        {
-          path: 'decisions',
-          name: 'Decisions',
-          component: () => import('@/pages/decisions/DecisionsPage.vue'),
-        },
+
         {
           path: 'overview',
           name: 'Overview',
@@ -149,6 +145,11 @@ const router = createRouter({
               component: () => import('@/pages/task/tabs/TaskFilesTab.vue'),
             },
           ],
+        },
+        {
+          path: 'decisions',
+          name: 'Decisions',
+          component: () => import('@/pages/decisions/DecisionsPage.vue'),
         },
       ],
     },

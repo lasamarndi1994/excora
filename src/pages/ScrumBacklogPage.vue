@@ -1,424 +1,218 @@
 <template>
-  <v-container fluid class="pa-0 h-100 d-flex flex-column whitespace-nowrap overflow-hidden bg-white">
-    <!-- Project Header -->
+  <div class="backlog-page">
     <ProjectHeader active-tab="backlog" />
 
-    <!-- Toolbar area -->
-    <div class="px-6 py-4 d-flex align-center gap-4 border-b">
-      <v-text-field density="compact" variant="outlined" placeholder="Search backlog..."
-        prepend-inner-icon="mdi-magnify" hide-details width="200" max-width="200"
-        class="bg-white mr-2 flex-grow-0 custom-search" color="primary"></v-text-field>
-
-      <v-avatar color="orange-darken-1" size="32" class="text-white text-caption font-weight-bold">
-        SB
-      </v-avatar>
-
-      <v-btn variant="outlined" class="text-none text-medium-emphasis border-card ml-2"
-        prepend-icon="mdi-filter-variant" size="small" color="grey-darken-1">
-        Filter
-      </v-btn>
-
-      <v-spacer></v-spacer>
-
-      <v-btn variant="outlined" class="text-none text-medium-emphasis border-card" size="small"
-        prepend-icon="mdi-arrow-collapse-down">
-      </v-btn>
-
-      <v-btn variant="outlined" class="text-none text-medium-emphasis border-card ml-2" size="small"
-        prepend-icon="mdi-wrench">
-      </v-btn>
-
-      <v-btn variant="outlined" class="text-none text-medium-emphasis border-card ml-2" size="small"
-        icon="mdi-dots-horizontal">
-      </v-btn>
+    <!-- Toolbar -->
+    <div class="bl-toolbar">
+      <div class="bl-toolbar-left">
+        <div class="search-wrap">
+          <v-icon size="14" color="#94a3b8" style="position:absolute;left:10px;top:50%;transform:translateY(-50%)">mdi-magnify</v-icon>
+          <input class="search-input" placeholder="Search backlog..." />
+        </div>
+        <div class="avatar-chip">SB</div>
+        <button class="tool-btn"><v-icon size="13">mdi-filter-variant</v-icon> Filter</button>
+      </div>
+      <div class="bl-toolbar-right">
+        <button class="icon-btn"><v-icon size="15">mdi-arrow-collapse-down</v-icon></button>
+        <button class="icon-btn"><v-icon size="15">mdi-wrench-outline</v-icon></button>
+        <button class="icon-btn"><v-icon size="15">mdi-dots-horizontal</v-icon></button>
+      </div>
     </div>
 
-    <!-- Backlog Content Area -->
-    <div class="flex-grow-1 px-8 py-6 overflow-y-auto bg-white">
-      <div class=" mx-auto">
-        <!-- Sprint 1 Plan -->
-        <div class="mb-8">
-          <div class="d-flex align-center justify-space-between mb-2">
-            <div class="d-flex align-center cursor-pointer">
-              <!-- Add checkbox from screenshot -->
-              <v-checkbox-btn density="compact" color="primary" class="mr-2" v-if="isSprintActive"></v-checkbox-btn>
-              <v-icon size="20" class="mr-1 text-medium-emphasis">mdi-chevron-down</v-icon>
+    <!-- Body -->
+    <div class="bl-body">
 
-              <h2 class="text-subtitle-1 font-weight-bold mb-0 mr-2">{{ sprintDetails.name }}</h2>
-
-              <span v-if="isSprintActive" class="text-caption text-medium-emphasis mr-2">
-                {{ formatSprintDates(sprintDetails.startDate, sprintDetails.endDate) }}
-              </span>
-
-              <v-btn v-if="!isSprintActive" variant="text" size="small" prepend-icon="mdi-pencil-outline"
-                class="text-none text-medium-emphasis" style="font-size: 11px;"
-                @click="isStartSprintDialogOpen = true">Add dates</v-btn>
-              <span class="text-caption text-medium-emphasis ml-1">({{ sprintIssues.length }} work item{{
-                sprintIssues.length === 1 ? '' : 's' }})</span>
-            </div>
-
-            <div class="d-flex align-center gap-3">
-              <div class="d-flex gap-1">
-                <v-chip size="x-small" color="grey-lighten-2"
-                  class="text-grey-darken-2 font-weight-bold rounded-sm">0</v-chip>
-                <v-chip size="x-small" color="blue-lighten-4"
-                  class="text-blue-darken-2 font-weight-bold rounded-sm">0</v-chip>
-                <v-chip size="x-small" color="green-lighten-4"
-                  class="text-green-darken-2 font-weight-bold rounded-sm">0</v-chip>
-              </div>
-              <v-btn v-if="!isSprintActive" type="button"
-                class="text-none bg-grey-lighten-3 text-medium-emphasis font-weight-medium rounded" size="small"
-                elevation="0" @click="isStartSprintDialogOpen = true" :disabled="sprintIssues.length === 0">Start
-                sprint</v-btn>
-              <v-btn v-else type="button"
-                class="text-none bg-grey-lighten-3 text-medium-emphasis font-weight-medium rounded" size="small"
-                elevation="0" @click="completeSprint">Complete sprint</v-btn>
-              <v-btn icon="mdi-dots-horizontal" variant="text" size="small" class="text-medium-emphasis"></v-btn>
-            </div>
+      <!-- Sprint Section -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-header-left" @click="sprintCollapsed = !sprintCollapsed">
+            <v-icon size="16" color="#64748b">{{ sprintCollapsed ? 'mdi-chevron-right' : 'mdi-chevron-down' }}</v-icon>
+            <span class="section-title">{{ sprintDetails.name }}</span>
+            <span v-if="isSprintActive" class="section-dates">{{ formatDates(sprintDetails.startDate, sprintDetails.endDate) }}</span>
+            <span class="section-count">({{ sprintIssues.length }} items)</span>
           </div>
-
-          <!-- Empty Sprint Box -->
-          <v-card v-if="sprintIssues.length === 0" variant="outlined"
-            class="border-dashed bg-grey-lighten-5 rounded d-flex flex-column align-center justify-center py-8 px-4"
-            elevation="0">
-            <div class="position-relative mb-2">
-              <v-sheet width="60" height="40" class="bg-transparent d-flex align-center justify-center">
-                <div class="d-flex">
-                  <div
-                    style="width: 24px; height: 24px; border-radius: 50%; background-color: #AB47BC; opacity: 0.8; margin-right: -10px;">
-                  </div>
-                  <div
-                    style="width: 24px; height: 24px; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); background-color: #FFA000; opacity: 0.8; margin-right: -10px; margin-top: 10px;">
-                  </div>
-                  <div style="width: 24px; height: 24px; background-color: #66BB6A; opacity: 0.8; margin-top: 5px;">
-                  </div>
-                </div>
-              </v-sheet>
+          <div class="section-header-right">
+            <div class="status-pills">
+              <span class="pill pill-grey">0</span>
+              <span class="pill pill-blue">0</span>
+              <span class="pill pill-green">0</span>
             </div>
-            <h3 class="text-subtitle-1 font-weight-bold mb-1">Plan your sprint</h3>
-            <p class="text-body-2 text-medium-emphasis text-center max-w-500">
-              Drag work items from the <span class="font-weight-bold">Backlog</span> section or create new
-              ones to plan the work for this sprint. Select <span class="font-weight-bold">Start
-                sprint</span> when you're ready.
-            </p>
-          </v-card>
-
-          <!-- Sprint Items container -->
-          <div v-else class="border rounded-sm overflow-hidden mb-1">
-            <div v-for="issue in sprintIssues" :key="issue.id"
-              class="d-flex align-center py-2 px-3 border-b issue-row hover-bg-grey">
-              <!-- <v-checkbox-btn density="compact" color="primary" class="mr-2"></v-checkbox-btn> -->
-              <v-sheet width="20" height="20" :color="getIssueIcon(issue.type).color"
-                class="rounded-sm d-flex align-center justify-center mr-2">
-                <v-icon size="14" color="white">{{ getIssueIcon(issue.type).icon }}</v-icon>
-              </v-sheet>
-              <span class="text-body-2 text-medium-emphasis mr-2" style="width: 45px;">{{ issue.key }}</span>
-              <span class="text-body-2 flex-grow-1 cursor-pointer hover-underline">{{ issue.summary }}</span>
-
-              <div class="d-flex align-center gap-3 status-controls">
-                <v-btn variant="flat" size="small" color="grey-lighten-3"
-                  class="text-none px-2 rounded-sm text-caption font-weight-bold text-grey-darken-2"
-                  style="height: 24px;">
-                  {{ issue.status }} <v-icon size="14" class="ml-1">mdi-chevron-down</v-icon>
-                </v-btn>
-
-                <v-chip size="x-small" color="transparent" variant="flat"
-                  class="text-medium-emphasis px-1 bg-transparent hover-bg-grey"
-                  style="min-width: 24px; justify-content: center;">-</v-chip>
-
-                <v-avatar v-if="issue.assignees && issue.assignees.length > 0" :image="issue.assignees[0]?.avatar"
-                  size="24" class="cursor-pointer"></v-avatar>
-                <v-avatar v-else color="grey-lighten-2" size="24"
-                  class="text-grey-darken-1 cursor-pointer d-flex align-center justify-center">
-                  <v-icon size="16">mdi-account-outline</v-icon>
-                </v-avatar>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="isCreatingSprintIssue"
-            class="create-issue-box rounded-xs d-flex align-center px-3 py-1 bg-white mt-1">
-            <v-icon size="18" color="primary" class="mr-1">mdi-checkbox-marked-outline</v-icon>
-            <v-icon size="16" color="medium-emphasis" class="mr-2">mdi-chevron-down</v-icon>
-
-            <input type="text" v-model="newSprintIssueTitle" placeholder="Describe what needs to be done."
-              class="flex-grow-1 text-body-2 outline-none py-1" autofocus @keyup.enter="createSprintIssue"
-              @keydown.esc="isCreatingSprintIssue = false" />
-
-            <div class="d-flex align-center gap-3">
-              <v-icon size="18" color="medium-emphasis"
-                class="cursor-pointer hover-text-primary">mdi-calendar-blank</v-icon>
-              <v-icon size="18" color="medium-emphasis"
-                class="cursor-pointer hover-text-primary">mdi-account-circle-outline</v-icon>
-
-              <v-btn type="button" size="small" variant="flat" color="grey-lighten-1"
-                class="text-none font-weight-medium px-2 text-medium-emphasis" @click="createSprintIssue">
-                Create
-                <v-icon end size="14">mdi-keyboard-return</v-icon>
-              </v-btn>
-            </div>
-          </div>
-          <v-btn v-else prepend-icon="mdi-plus" type="button"
-            class="text-none bg-grey-lighten-3 text-medium-emphasis font-weight-medium rounded mt-2" size="small"
-            @click="isCreatingSprintIssue = true">
-            Create
-          </v-btn>
-        </div>
-
-        <!-- Estimate Breakpoint -->
-        <div class="d-flex align-center mb-6">
-          <div class="flex-grow-1 border-t border-dashed"></div>
-          <div class="px-3 d-flex align-center gap-1 cursor-pointer">
-            <v-icon size="16" class="text-medium-emphasis">mdi-unfold-more-horizontal</v-icon>
-          </div>
-          <div class="flex-grow-1 border-t border-dashed"></div>
-          <div class="ml-4 text-caption text-medium-emphasis d-flex gap-2">
-            <span><span class="font-weight-bold">0</span> of <span class="font-weight-bold">0</span> work
-              items visible</span>
-            <span class="mx-1">|</span>
-            <span>Estimate: <span class="font-weight-bold">0</span> of <span class="font-weight-bold">0</span></span>
+            <button v-if="!isSprintActive" class="btn-secondary" :disabled="sprintIssues.length === 0" @click="isStartDialogOpen = true">Start sprint</button>
+            <button v-else class="btn-secondary" @click="completeSprint">Complete sprint</button>
+            <button class="icon-btn"><v-icon size="15">mdi-dots-horizontal</v-icon></button>
           </div>
         </div>
 
-        <!-- Backlog Section -->
-        <div>
-          <div class="d-flex align-center justify-space-between mb-2">
-            <div class="d-flex align-center cursor-pointer">
-              <v-icon size="20" class="mr-1 text-medium-emphasis">mdi-chevron-down</v-icon>
-              <h2 class="text-subtitle-1 font-weight-bold mb-0">Backlog</h2>
-              <span class="text-caption text-medium-emphasis ml-2">({{ backlogIssues.length }} work items)</span>
+        <template v-if="!sprintCollapsed">
+          <!-- Empty state -->
+          <div v-if="sprintIssues.length === 0" class="empty-sprint">
+            <div class="empty-shapes">
+              <span class="shape shape-circle"></span>
+              <span class="shape shape-triangle"></span>
+              <span class="shape shape-square"></span>
             </div>
-
-            <div class="d-flex align-center gap-3">
-              <div class="d-flex gap-1">
-                <v-chip size="x-small" color="grey-lighten-2"
-                  class="text-grey-darken-2 font-weight-bold rounded-sm">0</v-chip>
-                <v-chip size="x-small" color="blue-lighten-4"
-                  class="text-blue-darken-2 font-weight-bold rounded-sm">0</v-chip>
-                <v-chip size="x-small" color="green-lighten-4"
-                  class="text-green-darken-2 font-weight-bold rounded-sm">0</v-chip>
-              </div>
-              <v-btn class="text-none bg-grey-lighten-3 text-medium-emphasis font-weight-medium rounded" size="small"
-                elevation="0">Create sprint</v-btn>
-            </div>
+            <div class="empty-title">Plan your sprint</div>
+            <div class="empty-sub">Drag work items from the <strong>Backlog</strong> or create new ones, then click <strong>Start sprint</strong>.</div>
           </div>
 
-          <!-- Backlog Items container -->
-          <div v-if="backlogIssues.length > 0" class="border rounded-sm overflow-hidden mb-1">
-            <div v-for="issue in backlogIssues" :key="issue.id"
-              class="d-flex align-center py-2 px-3 border-b issue-row hover-bg-grey">
-              <!-- <v-checkbox-btn density="compact" color="primary" class="mr-2"></v-checkbox-btn> -->
-              <v-sheet width="20" height="20" :color="getIssueIcon(issue.type).color"
-                class="rounded-sm d-flex align-center justify-center mr-2">
-                <v-icon size="14" color="white">{{ getIssueIcon(issue.type).icon }}</v-icon>
-              </v-sheet>
-              <span class="text-body-2 text-medium-emphasis mr-2" style="width: 45px;">{{ issue.key }}</span>
-              <span class="text-body-2 flex-grow-1 cursor-pointer hover-underline">{{ issue.summary }}</span>
-
-              <div class="d-flex align-center gap-3 status-controls">
-                <v-btn variant="flat" size="small" color="grey-lighten-3"
-                  class="text-none px-2 rounded-sm text-caption font-weight-bold text-grey-darken-2"
-                  style="height: 24px;">
-                  {{ issue.status === 'TODO' ? 'TO DO' : issue.status }} <v-icon size="14"
-                    class="ml-1">mdi-chevron-down</v-icon>
-                </v-btn>
-
-                <v-chip size="x-small" color="transparent" variant="flat"
-                  class="text-medium-emphasis px-1 bg-transparent hover-bg-grey"
-                  style="min-width: 24px; justify-content: center;">-</v-chip>
-
-                <v-avatar v-if="issue.assignees && issue.assignees.length > 0" :image="issue.assignees[0]?.avatar"
-                  size="24" class="cursor-pointer"></v-avatar>
-                <v-avatar v-else color="grey-lighten-2" size="24"
-                  class="text-grey-darken-1 cursor-pointer d-flex align-center justify-center">
-                  <v-icon size="16">mdi-account-outline</v-icon>
-                </v-avatar>
+          <!-- Issue rows -->
+          <div v-else class="issue-list">
+            <div v-for="issue in sprintIssues" :key="issue.id" class="issue-row">
+              <div class="issue-type-icon" :style="`background:${getIcon(issue.type).color}`">
+                <v-icon size="12" color="white">{{ getIcon(issue.type).icon }}</v-icon>
+              </div>
+              <span class="issue-key">{{ issue.key }}</span>
+              <span class="issue-summary">{{ issue.summary }}</span>
+              <div class="issue-actions">
+                <span class="status-tag">{{ issue.status }}</span>
+                <img v-if="issue.assignees[0]" :src="issue.assignees[0].avatar" class="assignee-avatar" />
+                <div v-else class="assignee-avatar assignee-empty"><v-icon size="13" color="#94a3b8">mdi-account-outline</v-icon></div>
               </div>
             </div>
           </div>
 
-          <div v-if="isCreatingBacklogIssue"
-            class="create-issue-box rounded-xs d-flex align-center px-3 py-1 bg-white mt-1">
-            <v-icon size="18" color="primary" class="mr-1">mdi-checkbox-marked-outline</v-icon>
-            <v-icon size="16" color="medium-emphasis" class="mr-2">mdi-chevron-down</v-icon>
-
-            <input type="text" v-model="newBacklogIssueTitle" placeholder="Describe what needs to be done."
-              class="flex-grow-1 text-body-2 outline-none py-1" autofocus @keyup.enter="createBacklogIssue"
-              @keydown.esc="isCreatingBacklogIssue = false" />
-
-            <div class="d-flex align-center gap-3">
-              <v-icon size="18" color="medium-emphasis"
-                class="cursor-pointer hover-text-primary">mdi-calendar-blank</v-icon>
-              <v-icon size="18" color="medium-emphasis"
-                class="cursor-pointer hover-text-primary">mdi-account-circle-outline</v-icon>
-
-              <v-btn size="small" variant="flat" color="grey-lighten-1"
-                class="text-none font-weight-medium px-2 text-medium-emphasis" @click="createBacklogIssue">
-                Create
-                <v-icon end size="14">mdi-keyboard-return</v-icon>
-              </v-btn>
-            </div>
+          <!-- Inline create -->
+          <div v-if="creatingSprintIssue" class="inline-create">
+            <v-icon size="16" color="#4f46e5">mdi-checkbox-marked-outline</v-icon>
+            <input v-model="newSprintTitle" class="inline-input" placeholder="Describe what needs to be done."
+              autofocus @keyup.enter="createSprintIssue" @keydown.esc="creatingSprintIssue = false" />
+            <button class="btn-create" @click="createSprintIssue">Create</button>
+            <button class="btn-cancel-sm" @click="creatingSprintIssue = false">Cancel</button>
           </div>
-          <!-- <v-btn class="text-none bg-grey-lighten-3 text-medium-emphasis font-weight-medium rounded" size="small"
-                elevation="0">Create sprint</v-btn> -->
-          <v-btn v-else prepend-icon="mdi-plus" elevation="0"
-            class="text-none bg-grey-lighten-3 text-medium-emphasis font-weight-medium rounded mt-1" size="small"
-            @click="isCreatingBacklogIssue = true">
-            Create
-          </v-btn>
+          <button v-else class="btn-add" @click="creatingSprintIssue = true">
+            <v-icon size="13">mdi-plus</v-icon> Create
+          </button>
+        </template>
+      </div>
 
+      <!-- Divider -->
+      <div class="estimate-divider">
+        <div class="divider-line"></div>
+        <v-icon size="16" color="#94a3b8">mdi-unfold-more-horizontal</v-icon>
+        <div class="divider-line"></div>
+        <span class="divider-meta"><strong>0</strong> of <strong>0</strong> visible &nbsp;|&nbsp; Estimate: <strong>0</strong> of <strong>0</strong></span>
+      </div>
+
+      <!-- Backlog Section -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-header-left" @click="backlogCollapsed = !backlogCollapsed">
+            <v-icon size="16" color="#64748b">{{ backlogCollapsed ? 'mdi-chevron-right' : 'mdi-chevron-down' }}</v-icon>
+            <span class="section-title">Backlog</span>
+            <span class="section-count">({{ backlogIssues.length }} items)</span>
+          </div>
+          <div class="section-header-right">
+            <div class="status-pills">
+              <span class="pill pill-grey">0</span>
+              <span class="pill pill-blue">0</span>
+              <span class="pill pill-green">0</span>
+            </div>
+            <button class="btn-secondary">Create sprint</button>
+          </div>
         </div>
 
+        <template v-if="!backlogCollapsed">
+          <div v-if="backlogIssues.length > 0" class="issue-list">
+            <div v-for="issue in backlogIssues" :key="issue.id" class="issue-row">
+              <div class="issue-type-icon" :style="`background:${getIcon(issue.type).color}`">
+                <v-icon size="12" color="white">{{ getIcon(issue.type).icon }}</v-icon>
+              </div>
+              <span class="issue-key">{{ issue.key }}</span>
+              <span class="issue-summary">{{ issue.summary }}</span>
+              <div class="issue-actions">
+                <span class="status-tag">{{ issue.status === 'TODO' ? 'TO DO' : issue.status }}</span>
+                <img v-if="issue.assignees[0]" :src="issue.assignees[0].avatar" class="assignee-avatar" />
+                <div v-else class="assignee-avatar assignee-empty"><v-icon size="13" color="#94a3b8">mdi-account-outline</v-icon></div>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="creatingBacklogIssue" class="inline-create">
+            <v-icon size="16" color="#4f46e5">mdi-checkbox-marked-outline</v-icon>
+            <input v-model="newBacklogTitle" class="inline-input" placeholder="Describe what needs to be done."
+              autofocus @keyup.enter="createBacklogIssue" @keydown.esc="creatingBacklogIssue = false" />
+            <button class="btn-create" @click="createBacklogIssue">Create</button>
+            <button class="btn-cancel-sm" @click="creatingBacklogIssue = false">Cancel</button>
+          </div>
+          <button v-else class="btn-add" @click="creatingBacklogIssue = true">
+            <v-icon size="13">mdi-plus</v-icon> Create
+          </button>
+        </template>
       </div>
     </div>
 
     <!-- Start Sprint Dialog -->
-    <v-dialog v-model="isStartSprintDialogOpen" max-width="600" scroll-strategy="none">
-      <v-card class="rounded-md">
-        <v-card-title class="d-flex align-center justify-space-between pa-6 pb-2">
-          <span class="text-h5 font-weight-bold">Start another sprint</span>
-          <v-btn icon="mdi-close" variant="text" density="comfortable" size="small"
-            @click="isStartSprintDialogOpen = false"></v-btn>
-        </v-card-title>
-
-        <v-card-text class="px-6 pb-6 pt-2" style="overflow-y: auto; max-height: 80vh;">
-          <p class="text-body-1 font-weight-medium mb-4"><span class="font-weight-bold">{{ sprintIssues.length
-              }}</span> work item will be included in this sprint.</p>
-          <p class="text-caption text-medium-emphasis mb-4">Required fields are marked with an asterisk <span
-              class="text-error">*</span></p>
-
-          <v-form @submit.prevent>
-            <div class="mb-4">
-              <label class="text-body-2 font-weight-medium d-block mb-1">Sprint name <span
-                  class="text-error">*</span></label>
-              <v-text-field v-model="sprintDetails.name" variant="outlined" density="compact" hide-details
-                bg-color="white"></v-text-field>
-            </div>
-
-            <div class="mb-4">
-              <label class="text-body-2 font-weight-medium d-block mb-1">Duration <span
-                  class="text-error">*</span></label>
-              <v-select v-model="sprintDetails.duration" :items="['custom', '1 week', '2 weeks', '3 weeks', '4 weeks']"
-                variant="outlined" density="compact" hide-details bg-color="white"></v-select>
-            </div>
-
-            <div class="mb-1">
-              <label class="text-body-2 font-weight-medium d-block mb-1">Start date <span
-                  class="text-error">*</span></label>
-              <v-text-field v-model="sprintDetails.startDate" type="datetime-local" variant="outlined" density="compact"
-                hide-details bg-color="white" clearable></v-text-field>
-            </div>
-
-            <div class="mb-4">
-              <p class="text-caption text-medium-emphasis line-height-1 mb-0 mt-1">
-                Planned start date: <span class="font-weight-bold">24/01/2026, 17:36</span>
-              </p>
-              <p class="text-caption text-medium-emphasis line-height-1">
-                A sprint's start date impacts velocity and scope in reports. <a href="#"
-                  class="text-primary text-decoration-none">Learn more. <v-icon
-                    size="small">mdi-open-in-new</v-icon></a>
-              </p>
-            </div>
-
-            <div class="mb-4">
-              <label class="text-body-2 font-weight-medium d-block mb-1">End date <span
-                  class="text-error">*</span></label>
-              <v-text-field v-model="sprintDetails.endDate" type="datetime-local" variant="outlined" density="compact"
-                hide-details bg-color="white" clearable></v-text-field>
-            </div>
-
-            <div class="mb-4">
-              <label class="text-body-2 font-weight-medium d-block mb-1">Sprint goal</label>
-              <v-textarea v-model="sprintDetails.goal" variant="outlined" density="comfortable" rows="4" auto-grow
-                hide-details bg-color="white"></v-textarea>
-            </div>
-          </v-form>
-        </v-card-text>
-
-        <v-card-actions class="pa-4 bg-white justify-end">
-          <v-btn variant="text" class="text-none font-weight-medium text-medium-emphasis mr-2"
-            @click="isStartSprintDialogOpen = false">Cancel</v-btn>
-          <v-btn color="primary" variant="flat" class="text-none font-weight-medium px-6"
-            @click="startSprint">Start</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Complete Sprint Dialog -->
-    <v-dialog v-model="isCompleteSprintDialogOpen" max-width="500" scroll-strategy="none">
-      <v-card class="rounded-lg overflow-hidden">
-        <!-- Header Image area (CSS approximation of the wave/medal) -->
-        <div class="position-relative bg-blue-lighten-1" style="height: 120px; overflow: hidden;">
-          <svg viewBox="0 0 1440 320" style="position: absolute; bottom: 0; width: 100%; height: auto;">
-            <path fill="#03A9F4" fill-opacity="1"
-              d="M0,128L48,144C96,160,192,192,288,197.3C384,203,480,181,576,160C672,139,768,117,864,122.7C960,128,1056,160,1152,176C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z">
-            </path>
-          </svg>
-          <svg viewBox="0 0 1440 320" style="position: absolute; bottom: 0; width: 100%; height: auto; opacity: 0.5;">
-            <path fill="#00BCD4" fill-opacity="1"
-              d="M0,256L60,245.3C120,235,240,213,360,213.3C480,213,600,235,720,229.3C840,224,960,192,1080,186.7C1200,181,1320,203,1380,213.3L1440,224L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z">
-            </path>
-          </svg>
-
-          <!-- Badge Icon -->
-          <div class="position-absolute d-flex justify-center w-100" style="bottom: -20px;">
-            <svg width="80" height="80" viewBox="0 0 100 100">
-              <path d="M35 50 L20 100 L50 80 Z" fill="#0277bd" />
-              <path d="M65 50 L80 100 L50 80 Z" fill="#0091ea" />
-              <circle cx="50" cy="40" r="30" fill="#ffb300" />
-              <circle cx="50" cy="40" r="23" fill="#ffca28" />
-              <path d="M50 25 L54 34 L64 34 L56 40 L59 50 L50 44 L41 50 L44 40 L36 34 L46 34 Z" fill="#1565c0" />
-            </svg>
+    <div v-if="isStartDialogOpen" class="dialog-overlay" @click.self="isStartDialogOpen = false">
+      <div class="dialog-box">
+        <div class="dialog-header">
+          <span class="dialog-title">Start Sprint</span>
+          <button class="close-btn" @click="isStartDialogOpen = false">✕</button>
+        </div>
+        <div class="dialog-body">
+          <p class="dialog-info"><strong>{{ sprintIssues.length }}</strong> work item(s) will be included.</p>
+          <div class="field-group">
+            <label class="field-label">Sprint name <span class="req">*</span></label>
+            <input v-model="sprintDetails.name" class="field-input" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Duration</label>
+            <select v-model="sprintDetails.duration" class="field-input field-select">
+              <option v-for="d in ['custom','1 week','2 weeks','3 weeks','4 weeks']" :key="d">{{ d }}</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Start date <span class="req">*</span></label>
+            <input v-model="sprintDetails.startDate" type="datetime-local" class="field-input" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">End date <span class="req">*</span></label>
+            <input v-model="sprintDetails.endDate" type="datetime-local" class="field-input" />
+          </div>
+          <div class="field-group">
+            <label class="field-label">Sprint goal</label>
+            <textarea v-model="sprintDetails.goal" class="field-input field-textarea" rows="3" placeholder="What is the goal of this sprint?"></textarea>
           </div>
         </div>
+        <div class="dialog-footer">
+          <button class="btn-cancel-dialog" @click="isStartDialogOpen = false">Cancel</button>
+          <button class="btn-primary-dialog" @click="startSprint">Start Sprint</button>
+        </div>
+      </div>
+    </div>
 
-        <v-card-title class="px-6 pt-10 pb-4 text-h5 font-weight-bold">
-          Complete {{ sprintDetails.name || 'Sprint 1' }}
-        </v-card-title>
-
-        <v-card-text class="px-6 py-2">
-          <p class="text-body-1 mb-4 text-grey-darken-3">
-            This sprint contains <span class="font-weight-bold">{{ completedSprintIssuesCount }} completed work item{{
-              completedSprintIssuesCount !== 1 ? 's' : '' }}</span>
-            and <span class="font-weight-bold">{{ openSprintIssuesCount }} open work item{{ openSprintIssuesCount !== 1
-              ? 's' : '' }}</span>.
+    <!-- Complete Sprint Dialog -->
+    <div v-if="isCompleteDialogOpen" class="dialog-overlay" @click.self="isCompleteDialogOpen = false">
+      <div class="dialog-box">
+        <div class="complete-hero">
+          <svg viewBox="0 0 400 100" width="100%" height="100">
+            <path d="M0,60 Q100,20 200,50 T400,30 L400,100 L0,100 Z" fill="#4f46e5" opacity=".15"/>
+            <path d="M0,80 Q100,50 200,70 T400,55 L400,100 L0,100 Z" fill="#4f46e5" opacity=".25"/>
+          </svg>
+          <div class="complete-badge">🏅</div>
+        </div>
+        <div class="dialog-header" style="border-top:1px solid #e2e8f0;margin-top:8px">
+          <span class="dialog-title">Complete {{ sprintDetails.name }}</span>
+          <button class="close-btn" @click="isCompleteDialogOpen = false">✕</button>
+        </div>
+        <div class="dialog-body">
+          <p class="dialog-info">
+            <strong>{{ completedCount }}</strong> completed · <strong>{{ openCount }}</strong> open items.
           </p>
-
-          <ul class="ml-6 mb-6 text-body-2 text-grey-darken-3" style="list-style-type: disc;">
-            <li class="mb-2">Completed work items includes everything in the last column on the board, test.</li>
-            <li>Open work items includes everything from any other column on the board. Move these to a new sprint or
-              the backlog.</li>
-          </ul>
-
-          <div class="mb-4">
-            <label class="text-subtitle-2 font-weight-bold d-block mb-1">Move open work items to</label>
-            <v-select v-model="moveToDestination" :items="['EX Sprint 2', 'Backlog']" variant="outlined"
-              density="compact" hide-details bg-color="white"></v-select>
+          <div class="field-group">
+            <label class="field-label">Move open items to</label>
+            <select v-model="moveTo" class="field-input field-select">
+              <option>EX Sprint 2</option>
+              <option>Backlog</option>
+            </select>
           </div>
-
-          <v-sheet class="bg-grey-lighten-4 pa-4 rounded mt-4 d-flex align-start gap-3">
-            <v-checkbox-btn v-model="createRetrospective" color="primary" class="mt-0 pt-0"
-              hide-details></v-checkbox-btn>
-            <div>
-              <div class="font-weight-bold text-body-2 mb-1" style="color: #172B4D;">Create a retrospective for this
-                sprint</div>
-              <div class="text-body-2 text-medium-emphasis line-height-1">
-                Finish off your sprint with a Confluence retrospective! Contribute to your team's culture and improve
-                how you work.
-              </div>
-            </div>
-          </v-sheet>
-        </v-card-text>
-
-        <v-card-actions class="pa-6 pt-6 d-flex justify-end bg-white">
-          <v-btn variant="text" class="text-none font-weight-medium text-medium-emphasis mr-2"
-            @click="isCompleteSprintDialogOpen = false">Cancel</v-btn>
-          <v-btn color="primary" variant="flat" class="text-none font-weight-medium px-4"
-            @click="confirmCompleteSprint">Complete sprint</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+        </div>
+        <div class="dialog-footer">
+          <button class="btn-cancel-dialog" @click="isCompleteDialogOpen = false">Cancel</button>
+          <button class="btn-primary-dialog" @click="confirmComplete">Complete sprint</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -426,184 +220,245 @@ import { ref, computed } from 'vue'
 import { useTaskStore } from '@/stores/taskStore'
 import ProjectHeader from '@/components/ProjectHeader.vue'
 
-const taskStore = useTaskStore()
+const store = useTaskStore()
 
-const sprintIssues = computed(() => taskStore.issues.filter(i => i.sprintId === 'sprint-1'))
-const backlogIssues = computed(() => taskStore.issues.filter(i => !i.sprintId))
+const sprintIssues  = computed(() => store.issues.filter(i => i.sprintId === 'sprint-1'))
+const backlogIssues = computed(() => store.issues.filter(i => !i.sprintId))
 
-const isCreatingSprintIssue = ref(false)
-const newSprintIssueTitle = ref('')
+const sprintCollapsed  = ref(false)
+const backlogCollapsed = ref(false)
+const isSprintActive   = ref(false)
+const isStartDialogOpen    = ref(false)
+const isCompleteDialogOpen = ref(false)
+const moveTo = ref('EX Sprint 2')
 
-const isCreatingBacklogIssue = ref(false)
-const newBacklogIssueTitle = ref('')
+const sprintDetails = ref({ name: 'EX Sprint 1', duration: 'custom', startDate: '', endDate: '', goal: '' })
 
-const isStartSprintDialogOpen = ref(false)
-const isSprintActive = ref(false)
-const isCompleteSprintDialogOpen = ref(false)
-const moveToDestination = ref('EX Sprint 2')
-const createRetrospective = ref(true)
+const completedCount = computed(() => sprintIssues.value.filter(i => i.status === 'DONE').length)
+const openCount      = computed(() => sprintIssues.value.filter(i => i.status !== 'DONE').length)
 
-const sprintDetails = ref({
-  name: 'EX Sprint 1',
-  duration: 'custom',
-  startDate: '', // Will be populated in startSprint dialogue or pre-filled
-  endDate: '',
-  goal: ''
-})
-
-const completedSprintIssuesCount = computed(() => sprintIssues.value.filter(i => i.status === 'DONE').length)
-const openSprintIssuesCount = computed(() => sprintIssues.value.filter(i => i.status !== 'DONE').length)
-
-const formatSprintDates = (start: string, end: string) => {
-  if (!start || !end) return '';
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-  const startStr = startDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  const endStr = endDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  return `${startStr} - ${endStr}`;
+const formatDates = (s: string, e: string) => {
+  if (!s || !e) return ''
+  return `${new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })} – ${new Date(e).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
 }
 
-const startSprint = () => {
-  isSprintActive.value = true
-  isStartSprintDialogOpen.value = false
-}
+const startSprint   = () => { isSprintActive.value = true; isStartDialogOpen.value = false }
+const completeSprint = () => { isCompleteDialogOpen.value = true }
+const confirmComplete = () => { isSprintActive.value = false; isCompleteDialogOpen.value = false; sprintDetails.value.name = 'EX Sprint 2' }
 
-const completeSprint = () => {
-  isCompleteSprintDialogOpen.value = true
-}
+const getIcon = (type: string) => ({
+  Task:  { icon: 'mdi-check-bold',   color: '#3b82f6' },
+  Bug:   { icon: 'mdi-circle',       color: '#ef4444' },
+  Story: { icon: 'mdi-bookmark',     color: '#22c55e' },
+  Epic:  { icon: 'mdi-lightning-bolt', color: '#8b5cf6' },
+}[type] ?? { icon: 'mdi-check-bold', color: '#3b82f6' })
 
-const confirmCompleteSprint = () => {
-  isSprintActive.value = false
-  isCompleteSprintDialogOpen.value = false
-  sprintDetails.value = {
-    name: 'EX Sprint 2',
-    duration: 'custom',
-    startDate: '',
-    endDate: '',
-    goal: ''
-  }
-}
-
-const getIssueIcon = (type: string) => {
-  switch (type) {
-    case 'Task': return { icon: 'mdi-check-bold', color: 'blue' }
-    case 'Bug': return { icon: 'mdi-circle', color: 'red' }
-    case 'Story': return { icon: 'mdi-bookmark', color: 'green' }
-    case 'Epic': return { icon: 'mdi-lightning-bolt', color: 'purple' }
-    default: return { icon: 'mdi-check-bold', color: 'blue' }
-  }
-}
-
+const creatingSprintIssue = ref(false)
+const newSprintTitle = ref('')
 const createSprintIssue = () => {
-  if (!newSprintIssueTitle.value.trim()) return
-  taskStore.createIssue({
-    summary: newSprintIssueTitle.value,
-    status: 'TODO',
-    priority: 'Medium',
-    assignees: [],
-    type: 'Task',
-    sprintId: 'sprint-1'
-  })
-  newSprintIssueTitle.value = ''
-  isCreatingSprintIssue.value = false
+  if (!newSprintTitle.value.trim()) return
+  store.createIssue({ summary: newSprintTitle.value, status: 'TODO', priority: 'Medium', assignees: [], type: 'Task', sprintId: 'sprint-1' })
+  newSprintTitle.value = ''; creatingSprintIssue.value = false
 }
 
+const creatingBacklogIssue = ref(false)
+const newBacklogTitle = ref('')
 const createBacklogIssue = () => {
-  if (!newBacklogIssueTitle.value.trim()) return
-  taskStore.createIssue({
-    summary: newBacklogIssueTitle.value,
-    status: 'TODO',
-    priority: 'Medium',
-    assignees: [],
-    type: 'Task'
-  })
-  newBacklogIssueTitle.value = ''
-  isCreatingBacklogIssue.value = false
+  if (!newBacklogTitle.value.trim()) return
+  store.createIssue({ summary: newBacklogTitle.value, status: 'TODO', priority: 'Medium', assignees: [], type: 'Task' })
+  newBacklogTitle.value = ''; creatingBacklogIssue.value = false
 }
 </script>
 
 <style scoped>
-.gap-1 {
-  gap: 4px;
+.backlog-page {
+  display: flex; flex-direction: column; height: 100%;
+  font-family: 'Inter', sans-serif; background: #f8fafc; overflow: hidden;
 }
 
-.gap-2 {
-  gap: 8px;
+/* Toolbar */
+.bl-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 24px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; gap: 12px;
 }
-
-.gap-3 {
-  gap: 12px;
+.bl-toolbar-left, .bl-toolbar-right { display: flex; align-items: center; gap: 8px; }
+.search-wrap { position: relative; }
+.search-input {
+  padding: 6px 10px 6px 30px; border: 1px solid #e2e8f0; border-radius: 8px;
+  font-size: 13px; color: #1e293b; background: #f8fafc; outline: none; width: 200px;
+  font-family: 'Inter', sans-serif;
 }
-
-.gap-4 {
-  gap: 16px;
+.search-input:focus { border-color: #4f46e5; background: #fff; }
+.avatar-chip {
+  width: 30px; height: 30px; border-radius: 50%; background: #f97316;
+  color: #fff; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
 }
-
-.border-card {
-  border: 1px solid rgba(0, 0, 0, 0.12);
+.tool-btn {
+  display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px;
+  border: 1px solid #e2e8f0; border-radius: 8px; background: #fff;
+  font-size: 12.5px; color: #475569; cursor: pointer; font-family: 'Inter', sans-serif;
 }
-
-.border-dashed {
-  border: 2px dashed rgba(0, 0, 0, 0.12);
+.tool-btn:hover { background: #f1f5f9; }
+.icon-btn {
+  width: 30px; height: 30px; border: 1px solid #e2e8f0; border-radius: 7px;
+  background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: #64748b; transition: background .12s;
 }
+.icon-btn:hover { background: #f1f5f9; }
 
-.max-w-1000 {
-  max-width: 1000px;
+/* Body */
+.bl-body { flex: 1; overflow-y: auto; padding: 20px 24px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+/* Section */
+.section { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer;
 }
-
-.max-w-500 {
-  max-width: 500px;
+.section-header:hover { background: #fafafa; }
+.section-header-left { display: flex; align-items: center; gap: 8px; }
+.section-title { font-size: 14px; font-weight: 700; color: #0f172a; }
+.section-dates { font-size: 12px; color: #94a3b8; }
+.section-count { font-size: 12px; color: #94a3b8; }
+.section-header-right { display: flex; align-items: center; gap: 8px; }
+.status-pills { display: flex; gap: 4px; }
+.pill { padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+.pill-grey  { background: #f1f5f9; color: #64748b; }
+.pill-blue  { background: #dbeafe; color: #1d4ed8; }
+.pill-green { background: #dcfce7; color: #15803d; }
+.btn-secondary {
+  padding: 5px 12px; border: 1px solid #e2e8f0; border-radius: 7px;
+  background: #f8fafc; font-size: 12.5px; font-weight: 500; color: #475569;
+  cursor: pointer; font-family: 'Inter', sans-serif; transition: background .12s;
 }
+.btn-secondary:hover:not(:disabled) { background: #f1f5f9; }
+.btn-secondary:disabled { opacity: .45; cursor: not-allowed; }
 
-:deep(.v-btn--active) {
-  color: var(--v-theme-primary);
+/* Empty state */
+.empty-sprint {
+  padding: 32px 24px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  border: 2px dashed #e2e8f0; margin: 12px; border-radius: 10px; background: #fafafa;
 }
+.empty-shapes { display: flex; gap: 6px; align-items: center; }
+.shape { display: inline-block; }
+.shape-circle   { width: 22px; height: 22px; border-radius: 50%; background: #8b5cf6; opacity: .8; }
+.shape-triangle { width: 0; height: 0; border-left: 11px solid transparent; border-right: 11px solid transparent; border-bottom: 20px solid #f97316; opacity: .8; }
+.shape-square   { width: 20px; height: 20px; background: #22c55e; opacity: .8; border-radius: 3px; }
+.empty-title { font-size: 14px; font-weight: 700; color: #0f172a; }
+.empty-sub   { font-size: 13px; color: #64748b; text-align: center; max-width: 420px; line-height: 1.5; }
 
-.custom-search :deep(.v-field__input) {
-  min-height: 32px !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-.custom-search :deep(.v-field__outline) {
-  --v-field-border-opacity: 0.12;
-}
-
-.hover-bg-grey:hover {
-  background-color: #f4f5f7;
-}
-
-.hover-underline:hover {
-  text-decoration: underline;
-}
-
+/* Issue list */
+.issue-list { display: flex; flex-direction: column; }
 .issue-row {
-  transition: background-color 0.2s;
+  display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+  border-bottom: 1px solid #f1f5f9; transition: background .1s;
 }
+.issue-row:last-child { border-bottom: none; }
+.issue-row:hover { background: #f8fafc; }
+.issue-type-icon {
+  width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.issue-key { font-size: 12px; color: #94a3b8; font-weight: 600; width: 52px; flex-shrink: 0; }
+.issue-summary { flex: 1; font-size: 13px; color: #1e293b; cursor: pointer; }
+.issue-summary:hover { text-decoration: underline; }
+.issue-actions { display: flex; align-items: center; gap: 8px; opacity: .7; transition: opacity .15s; }
+.issue-row:hover .issue-actions { opacity: 1; }
+.status-tag {
+  padding: 2px 8px; background: #f1f5f9; border-radius: 5px;
+  font-size: 11px; font-weight: 600; color: #475569; white-space: nowrap;
+}
+.assignee-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+.assignee-empty  { width: 24px; height: 24px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; }
 
-.status-controls {
-  opacity: 0.8;
-  transition: opacity 0.2s;
+/* Inline create */
+.inline-create {
+  display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+  border-top: 1px solid #e2e8f0; background: #fff;
+  border: 1px solid #4f46e5; border-radius: 0 0 12px 12px;
+  box-shadow: 0 0 0 2px rgba(79,70,229,.1);
 }
+.inline-input {
+  flex: 1; border: none; outline: none; font-size: 13px; color: #1e293b;
+  font-family: 'Inter', sans-serif; background: transparent;
+}
+.inline-input::placeholder { color: #94a3b8; }
+.btn-create {
+  padding: 4px 12px; background: #4f46e5; color: #fff; border: none;
+  border-radius: 6px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.btn-cancel-sm {
+  padding: 4px 10px; background: none; border: 1px solid #e2e8f0;
+  border-radius: 6px; font-size: 12.5px; color: #64748b; cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.btn-add {
+  display: inline-flex; align-items: center; gap: 4px; margin: 10px 16px;
+  padding: 5px 12px; background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 7px; font-size: 12.5px; color: #64748b; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: background .12s;
+}
+.btn-add:hover { background: #f1f5f9; color: #4f46e5; }
 
-.issue-row:hover .status-controls {
-  opacity: 1;
+/* Divider */
+.estimate-divider {
+  display: flex; align-items: center; gap: 10px; padding: 0 4px;
 }
+.divider-line { flex: 1; border-top: 2px dashed #e2e8f0; }
+.divider-meta { font-size: 12px; color: #94a3b8; white-space: nowrap; }
 
-.create-issue-box {
-  border: 1px solid rgb(var(--v-theme-primary));
-  box-shadow: 0 0 0 1px rgb(var(--v-theme-primary));
+/* Dialog */
+.dialog-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px;
 }
-
-.outline-none {
-  outline: none;
+.dialog-box {
+  background: #fff; border-radius: 14px; width: 100%; max-width: 520px;
+  max-height: 90vh; display: flex; flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,.18); font-family: 'Inter', sans-serif;
+  animation: fadeUp .2s ease; overflow: hidden;
 }
-
-.outline-none::placeholder {
-  color: #9e9e9e;
+@keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+.complete-hero { position: relative; overflow: hidden; }
+.complete-badge {
+  position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+  font-size: 40px; z-index: 2;
 }
-
-.hover-text-primary:hover {
-  color: rgb(var(--v-theme-primary)) !important;
+.dialog-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px 14px; border-bottom: 1px solid #e2e8f0;
 }
+.dialog-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+.close-btn { background: none; border: none; cursor: pointer; font-size: 14px; color: #94a3b8; padding: 4px 8px; border-radius: 6px; }
+.close-btn:hover { background: #f1f5f9; }
+.dialog-body { padding: 18px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.dialog-info { font-size: 13px; color: #475569; margin: 0; }
+.field-group { display: flex; flex-direction: column; gap: 5px; }
+.field-label { font-size: 13px; font-weight: 600; color: #374151; }
+.req { color: #ef4444; }
+.field-input {
+  padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px;
+  font-size: 13px; color: #1e293b; background: #f8fafc; outline: none;
+  font-family: 'Inter', sans-serif; transition: border-color .15s;
+}
+.field-input:focus { border-color: #4f46e5; background: #fff; }
+.field-select { appearance: none; cursor: pointer; }
+.field-textarea { resize: vertical; min-height: 80px; }
+.dialog-footer {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding: 14px 24px; border-top: 1px solid #e2e8f0; background: #f8fafc;
+}
+.btn-cancel-dialog {
+  padding: 8px 16px; border: 1px solid #e2e8f0; border-radius: 8px;
+  background: #fff; font-size: 13px; color: #475569; cursor: pointer; font-family: 'Inter', sans-serif;
+}
+.btn-cancel-dialog:hover { background: #f1f5f9; }
+.btn-primary-dialog {
+  padding: 8px 20px; border: none; border-radius: 8px;
+  background: #4f46e5; color: #fff; font-size: 13px; font-weight: 600;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+}
+.btn-primary-dialog:hover { background: #4338ca; }
 </style>

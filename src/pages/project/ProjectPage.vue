@@ -1,289 +1,337 @@
 <template>
-  <v-container fluid class="pa-6  mx-auto">
+  <div class="proj-root">
+
     <!-- Header -->
-    <div class="mb-6">
-      <div class="d-flex align-center justify-space-between mb-2">
-        <h1 class="text-h5 font-weight-bold">Projects</h1>
+    <div class="proj-header">
+      <div>
+        <h1 class="proj-title">Projects</h1>
+        <p class="proj-sub">Manage and track all your team's work</p>
+      </div>
+      <div class="proj-header-right">
+        <button class="hdr-btn"><v-icon size="13">mdi-filter-variant</v-icon> Filter</button>
+        <button class="hdr-btn hdr-btn--primary" @click="$router.push('/project/spaces')">
+          <v-icon size="13">mdi-plus</v-icon> New Project
+        </button>
       </div>
     </div>
 
-    <!-- Recent Spaces Section -->
-    <div class="mb-8">
-      <div class="d-flex align-center justify-space-between mb-4">
-        <h2 class="text-subtitle-1 text-medium-emphasis">Recent spaces</h2>
-        <v-btn variant="text" color="primary" class="text-none" to="/project/spaces">View all projects</v-btn>
-      </div>
+    <div class="proj-body">
 
-      <v-row>
-        <!-- Dynamic Cards -->
-        <v-col v-for="space in spaces" :key="space.key" cols="12" md="4" lg="3">
-          <v-card class="project-card h-100 cursor-pointer d-flex flex-column" elevation="0" border
+      <!-- Recent Spaces -->
+      <div class="section">
+        <div class="section-head">
+          <span class="section-title">Recent spaces</span>
+          <button class="view-all-btn" @click="$router.push('/project/spaces')">
+            View all <v-icon size="13">mdi-arrow-right</v-icon>
+          </button>
+        </div>
+
+        <div class="spaces-grid">
+          <div v-for="(space, i) in spaces" :key="space.key"
+            class="space-card"
+            :style="{ animationDelay: i * 50 + 'ms' }"
             @click="$router.push('/board')">
-            <div class="card-border-left" :class="`bg-${space.borderColor}`"></div>
-            <v-card-text class="pa-4 flex-grow-1 d-flex flex-column">
-              <div class="d-flex align-start mb-4">
-                <v-sheet class="mr-3 rounded d-flex align-center justify-center project-icon"
-                  :class="`bg-${space.color}`" width="32" height="32">
-                  <v-icon color="white" size="20">{{ space.icon }}</v-icon>
-                </v-sheet>
-                <div>
-                  <h3 class="text-subtitle-2 font-weight-bold mb-0 line-height-1 text-truncate"
-                    style="max-width: 140px;" :title="space.name">{{ space.name }}</h3>
-                  <span class="text-caption text-medium-emphasis">{{ space.type }}</span>
+            <div class="sc-accent" :style="{ background: space.accentColor }"></div>
+            <div class="sc-body">
+              <div class="sc-top">
+                <div class="sc-icon" :style="{ background: space.iconBg }">
+                  <v-icon size="18" :color="space.iconColor">{{ space.icon }}</v-icon>
                 </div>
+                <div class="sc-info">
+                  <div class="sc-name">{{ space.name }}</div>
+                  <div class="sc-type">{{ space.type }}</div>
+                </div>
+                <button class="sc-star" :class="{ starred: space.starred }" @click.stop="space.starred = !space.starred">
+                  <v-icon size="14">{{ space.starred ? 'mdi-star' : 'mdi-star-outline' }}</v-icon>
+                </button>
               </div>
 
-              <div class="ml-3 pr-2">
-                <div class="text-caption text-medium-emphasis mb-2 mt-2">Quick links</div>
-
-                <div class="d-flex justify-space-between align-center mb-1">
-                  <span class="text-caption text-medium-emphasis">My open work items</span>
-                  <v-chip size="x-small" variant="flat" color="surface-variant">0</v-chip>
+              <div class="sc-links">
+                <div class="sc-link-row">
+                  <span>My open work items</span>
+                  <span class="sc-badge">0</span>
                 </div>
-
-                <div class="d-flex justify-space-between align-center mb-4">
-                  <span class="text-caption text-medium-emphasis">Done work items</span>
+                <div class="sc-link-row">
+                  <span>Done work items</span>
+                  <span class="sc-badge sc-badge--green">{{ space.done }}</span>
                 </div>
               </div>
-            </v-card-text>
-            <v-divider></v-divider>
-            <v-card-actions class="px-4 py-2 bg-grey-lighten-4">
-              <span class="text-caption font-weight-medium text-medium-emphasis d-flex align-center ml-3">
-                1 board <v-icon size="16" class="ml-1">mdi-chevron-down</v-icon>
-              </span>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
-    </div>
-
-    <!-- Tabs Section -->
-    <v-tabs density="compact" color="primary" class="border-b mb-12" v-model="activeTab">
-      <v-tab class="text-none font-weight-medium px-4" value="worked">Worked on</v-tab>
-      <v-tab class="text-none font-weight-medium px-4" value="viewed">Viewed</v-tab>
-      <v-tab class="text-none font-weight-medium px-4" value="assigned">
-        Assigned to me <span class="tab-badge ml-2 text-caption">0</span>
-      </v-tab>
-      <v-tab class="text-none font-weight-medium px-4" value="starred">Starred</v-tab>
-      <v-tab class="text-none font-weight-medium px-4" value="boards">Boards</v-tab>
-    </v-tabs>
-
-    <!-- Empty State Content -->
-    <v-window v-model="activeTab">
-      <!-- Assigned to me tab (Empty state illustration) -->
-      <v-window-item value="assigned">
-        <div class="d-flex flex-column align-center justify-center text-center py-8">
-
-          <div class="position-relative mb-8 mt-4" style="width: 280px; height: 160px;">
-
-            <!-- Success Badge (Top floating) -->
-            <div class="success-badge bg-teal-accent-4 rounded-circle d-flex align-center justify-center pa-2"
-              style="width: 56px; height: 56px;">
-              <v-icon color="white" size="36">mdi-check-circle</v-icon>
             </div>
+            <div class="sc-footer">
+              <div class="sc-lead">
+                <div class="sc-lead-av" :style="{ background: space.leadBg }">{{ space.leadInitials }}</div>
+                <span>{{ space.leadName }}</span>
+              </div>
+              <span class="sc-board-tag">1 board</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-            <!-- Laptop Screen -->
-            <v-sheet elevation="1" class="laptop-screen bg-grey-lighten-3 d-flex overflow-hidden">
-              <!-- Sidebar -->
-              <div class="bg-blue-darken-3 h-100" style="width: 25px;"></div>
+      <!-- Activity tabs -->
+      <div class="section">
+        <div class="activity-tabs">
+          <button v-for="tab in activityTabs" :key="tab.value"
+            class="act-tab" :class="{ active: activeTab === tab.value }"
+            @click="activeTab = tab.value">
+            {{ tab.label }}
+            <span v-if="tab.count !== undefined" class="act-tab-badge">{{ tab.count }}</span>
+          </button>
+        </div>
 
-              <!-- Main Content Area -->
-              <div class="bg-white h-100 flex-grow-1 d-flex flex-column pa-3">
-                <!-- Top section -->
-                <div class="d-flex gap-2 mb-2">
-                  <div class="bg-grey-lighten-2 rounded" style="width: 40px; height: 30px;"></div>
-                  <div class="d-flex flex-column gap-1 flex-grow-1">
-                    <div class="bg-blue-lighten-5 w-100 rounded" style="height: 12px;"></div>
-                    <div class="bg-blue-darken-1 w-100 rounded" style="height: 12px;"></div>
-                  </div>
+        <!-- Worked on -->
+        <div v-if="activeTab === 'worked'" class="activity-feed">
+          <div v-for="(item, i) in workedItems" :key="i" class="act-item" :style="{ animationDelay: i * 40 + 'ms' }">
+            <div class="act-icon" :style="{ background: item.iconBg }">
+              <v-icon size="14" :color="item.iconColor">{{ item.icon }}</v-icon>
+            </div>
+            <div class="act-body">
+              <div class="act-text">
+                <span class="act-user">{{ item.user }}</span>
+                <span class="act-action"> {{ item.action }} </span>
+                <span class="act-link">{{ item.target }}</span>
+              </div>
+              <div class="act-meta">{{ item.project }} · {{ item.time }}</div>
+            </div>
+            <span class="act-status-chip" :class="`chip-${item.statusType}`">{{ item.status }}</span>
+          </div>
+        </div>
+
+        <!-- Viewed -->
+        <div v-else-if="activeTab === 'viewed'" class="activity-feed">
+          <div v-for="(item, i) in viewedItems" :key="i" class="act-item" :style="{ animationDelay: i * 40 + 'ms' }">
+            <div class="act-icon" :style="{ background: item.iconBg }">
+              <v-icon size="14" :color="item.iconColor">{{ item.icon }}</v-icon>
+            </div>
+            <div class="act-body">
+              <div class="act-text"><span class="act-link">{{ item.target }}</span></div>
+              <div class="act-meta">{{ item.project }} · {{ item.time }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assigned to me -->
+        <div v-else-if="activeTab === 'assigned'" class="empty-state">
+          <div class="es-illustration">
+            <div class="es-laptop">
+              <div class="es-screen">
+                <div class="es-sidebar"></div>
+                <div class="es-content">
+                  <div class="es-bar es-bar--light"></div>
+                  <div class="es-bar es-bar--dark"></div>
+                  <div class="es-bar es-bar--light" style="width:60%"></div>
                 </div>
               </div>
-            </v-sheet>
-
-            <!-- Notification Toast (Floating right) -->
-            <v-sheet elevation="3" class="notification-toast bg-teal-accent-3 rounded d-flex align-center px-2 shadow">
-              <v-sheet class="rounded-circle bg-white opacity-60" width="8" height="8"></v-sheet>
-            </v-sheet>
-
-            <!-- Laptop Base/Keyboard -->
-            <v-sheet class="laptop-base bg-blue-grey-darken-2 d-flex justify-center align-end pb-1"></v-sheet>
+              <div class="es-base"></div>
+            </div>
+            <div class="es-badge"><v-icon size="22" color="white">mdi-check-circle</v-icon></div>
+            <div class="es-toast"></div>
           </div>
-
-          <h2 class="text-h6 font-weight-bold mb-1 mt-4">Find all your open work items in one place</h2>
-          <p class="text-body-2 text-medium-emphasis">You have no open work items assigned to you</p>
+          <div class="es-title">Find all your open work items in one place</div>
+          <div class="es-sub">You have no open work items assigned to you</div>
         </div>
-      </v-window-item>
 
-      <!-- Fallback generic empty states -->
-      <v-window-item v-for="tab in ['worked', 'viewed', 'starred', 'boards']" :key="tab" :value="tab">
-        <div class="text-center py-12 text-medium-emphasis">
-          Nothing to display in this tab yet.
+        <!-- Starred -->
+        <div v-else-if="activeTab === 'starred'" class="activity-feed">
+          <div v-for="s in spaces.filter(sp => sp.starred)" :key="s.key" class="act-item">
+            <div class="act-icon" :style="{ background: s.iconBg }">
+              <v-icon size="14" :color="s.iconColor">{{ s.icon }}</v-icon>
+            </div>
+            <div class="act-body">
+              <div class="act-text"><span class="act-link">{{ s.name }}</span></div>
+              <div class="act-meta">{{ s.type }}</div>
+            </div>
+            <span class="sc-board-tag">Starred</span>
+          </div>
+          <div v-if="!spaces.some(s => s.starred)" class="empty-simple">
+            <v-icon size="36" style="color:#cbd5e1">mdi-star-outline</v-icon>
+            <div>No starred projects yet</div>
+          </div>
         </div>
-      </v-window-item>
-    </v-window>
 
-  </v-container>
+        <!-- Boards -->
+        <div v-else class="empty-simple">
+          <v-icon size="36" style="color:#cbd5e1">mdi-view-column-outline</v-icon>
+          <div>No boards to display</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const activeTab = ref('assigned')
+const activeTab = ref('worked')
 
-// Static data for projects (Recent spaces) modeled after SpacesPage.vue data
+const activityTabs = [
+  { value: 'worked',   label: 'Worked on' },
+  { value: 'viewed',   label: 'Viewed' },
+  { value: 'assigned', label: 'Assigned to me', count: 0 },
+  { value: 'starred',  label: 'Starred' },
+  { value: 'boards',   label: 'Boards' },
+]
+
 const spaces = ref([
-  {
-    name: 'Cryptocurrency Payment Gateway',
-    key: 'CPG',
-    type: 'Team-managed software',
-    icon: 'mdi-poll',
-    color: 'red-darken-2',
-    borderColor: 'red-lighten-3'
-  },
-  {
-    name: 'Execora',
-    key: 'EX',
-    type: 'Team-managed software',
-    icon: 'mdi-wallet-bifold',
-    color: 'blue-darken-3',
-    borderColor: 'warning'
-  },
-  {
-    name: 'Project management',
-    key: 'PM',
-    type: 'Team-managed business',
-    icon: 'mdi-rocket-launch',
-    color: 'indigo-darken-4',
-    borderColor: 'blue-grey-lighten-4'
-  },
-  {
-    name: 'Kanban 1',
-    key: 'K1',
-    type: 'Team-managed software',
-    icon: 'mdi-cellphone-link',
-    color: 'blue',
-    borderColor: 'blue-lighten-3'
-  },
-  {
-    name: 'Kanban',
-    key: 'KAN',
-    type: 'Team-managed software',
-    icon: 'mdi-cellphone-link',
-    color: 'amber-darken-2',
-    borderColor: 'amber-lighten-3'
-  },
-  {
-    name: 'Marketing asset creation',
-    key: 'MAC',
-    type: 'Team-managed business',
-    icon: 'mdi-puzzle',
-    color: 'cyan-darken-1',
-    borderColor: 'cyan-lighten-3'
-  },
+  { name: 'Cryptocurrency Payment Gateway', key: 'CPG', type: 'Team-managed software', icon: 'mdi-poll',           iconBg: '#fef2f2', iconColor: '#ef4444', accentColor: '#ef4444', leadName: 'Satya B.', leadInitials: 'SB', leadBg: '#fed7aa', starred: true,  done: 4 },
+  { name: 'Execora',                        key: 'EX',  type: 'Team-managed software', icon: 'mdi-wallet-bifold',  iconBg: '#eff6ff', iconColor: '#2563eb', accentColor: '#2563eb', leadName: 'Satya B.', leadInitials: 'SB', leadBg: '#fed7aa', starred: false, done: 12 },
+  { name: 'Project Management',             key: 'PM',  type: 'Team-managed business', icon: 'mdi-rocket-launch',  iconBg: '#eef2ff', iconColor: '#4f46e5', accentColor: '#4f46e5', leadName: 'Lasa M.',  leadInitials: 'LM', leadBg: '#fce7f3', starred: false, done: 7 },
+  { name: 'Kanban 1',                       key: 'K1',  type: 'Team-managed software', icon: 'mdi-cellphone-link', iconBg: '#eff6ff', iconColor: '#3b82f6', accentColor: '#3b82f6', leadName: 'Lasa M.',  leadInitials: 'LM', leadBg: '#fce7f3', starred: false, done: 2 },
+  { name: 'Kanban',                         key: 'KAN', type: 'Team-managed software', icon: 'mdi-cellphone-link', iconBg: '#fffbeb', iconColor: '#d97706', accentColor: '#f59e0b', leadName: 'Lasa M.',  leadInitials: 'LM', leadBg: '#fce7f3', starred: false, done: 5 },
+  { name: 'Marketing Asset Creation',       key: 'MAC', type: 'Team-managed business', icon: 'mdi-puzzle',         iconBg: '#ecfeff', iconColor: '#0891b2', accentColor: '#06b6d4', leadName: 'Lasa M.',  leadInitials: 'LM', leadBg: '#fce7f3', starred: false, done: 3 },
 ])
+
+const workedItems = [
+  { user: 'You', action: 'updated', target: 'EKYC NRI Flow KT', project: 'Execora (EX)', time: '2h ago', icon: 'mdi-pencil-outline', iconBg: '#eef2ff', iconColor: '#4f46e5', status: 'In Progress', statusType: 'info' },
+  { user: 'You', action: 'closed', target: 'Partner library task updates', project: 'Execora (EX)', time: '5h ago', icon: 'mdi-check-circle-outline', iconBg: '#f0fdf4', iconColor: '#10b981', status: 'Done', statusType: 'success' },
+  { user: 'You', action: 'commented on', target: 'Performance Dashboard Implementation', project: 'Analytics', time: 'Yesterday', icon: 'mdi-message-outline', iconBg: '#faf5ff', iconColor: '#a855f7', status: 'Review', statusType: 'warn' },
+  { user: 'You', action: 'created', target: 'Sprint 25 planning board', project: 'Project Management', time: '2 days ago', icon: 'mdi-plus-circle-outline', iconBg: '#eff6ff', iconColor: '#2563eb', status: 'Todo', statusType: 'grey' },
+]
+
+const viewedItems = [
+  { target: 'EKYC Code analysis for all segments', project: 'Execora (EX)', time: '1h ago', icon: 'mdi-eye-outline', iconBg: '#f8fafc', iconColor: '#64748b' },
+  { target: 'Velocity Chart Q1 2025', project: 'Analytics', time: '3h ago', icon: 'mdi-eye-outline', iconBg: '#f8fafc', iconColor: '#64748b' },
+  { target: 'Marketing campaign assets', project: 'Marketing Asset Creation', time: 'Yesterday', icon: 'mdi-eye-outline', iconBg: '#f8fafc', iconColor: '#64748b' },
+]
 </script>
 
 <style scoped>
-/* .max-w-1200 {
-  max-width: 1200px;
-} */
-
-.line-height-1 {
-  line-height: 1.2;
+.proj-root {
+  display: flex; flex-direction: column; height: 100%; overflow: hidden;
+  font-family: 'Inter', sans-serif; font-size: 13px; color: #1e293b; background: #f8fafc;
 }
 
-.gap-1 {
-  gap: 4px;
+/* Header */
+.proj-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 26px 14px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;
 }
-
-.gap-2 {
-  gap: 8px;
+.proj-title { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 3px; }
+.proj-sub { font-size: 12px; color: #94a3b8; margin: 0; }
+.proj-header-right { display: flex; gap: 8px; }
+.hdr-btn {
+  display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px;
+  border-radius: 8px; border: 1px solid #e2e8f0; background: #fff;
+  font-size: 12.5px; font-weight: 500; color: #475569;
+  cursor: pointer; font-family: 'Inter', sans-serif; transition: background .12s, border-color .12s;
 }
+.hdr-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+.hdr-btn--primary { background: #4f46e5; border-color: #4f46e5; color: #fff; box-shadow: 0 2px 8px rgba(79,70,229,.25); }
+.hdr-btn--primary:hover { background: #4338ca; border-color: #4338ca; }
 
-/* Tab styling adjustments */
-:deep(.v-btn--active) {
-  color: var(--v-theme-primary);
+/* Body */
+.proj-body { flex: 1; overflow-y: auto; padding: 20px 26px; display: flex; flex-direction: column; gap: 24px; }
+
+/* Section */
+.section { display: flex; flex-direction: column; gap: 14px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; }
+.section-title { font-size: 13.5px; font-weight: 700; color: #0f172a; }
+.view-all-btn {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 500;
+  color: #4f46e5; background: none; border: none; cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: color .12s;
 }
+.view-all-btn:hover { color: #4338ca; }
 
-.tab-badge {
-  background-color: #f0f0f0;
-  color: #42526e;
-  border-radius: 12px;
-  padding: 0 6px;
-  font-weight: 600;
-}
-
-/* Project Card Styling */
-.project-card {
+/* Spaces grid */
+.spaces-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.space-card {
+  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
+  overflow: hidden; cursor: pointer; display: flex; flex-direction: column;
+  animation: fadeUp .25s ease both;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
   position: relative;
-  transition: all 0.2s ease-in-out;
-  overflow: hidden;
-  border-radius: 4px;
-  background-color: rgb(var(--v-theme-surface));
 }
+.space-card:hover { border-color: #a5b4fc; box-shadow: 0 4px 16px rgba(79,70,229,.08); transform: translateY(-2px); }
+.sc-accent { height: 3px; width: 100%; flex-shrink: 0; }
+.sc-body { padding: 14px 14px 10px; flex: 1; }
+.sc-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+.sc-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.sc-info { flex: 1; min-width: 0; }
+.sc-name { font-size: 13px; font-weight: 600; color: #0f172a; line-height: 1.3; margin-bottom: 2px; }
+.sc-type { font-size: 11px; color: #94a3b8; }
+.sc-star {
+  display: flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 6px; border: none; background: none;
+  color: #cbd5e1; cursor: pointer; flex-shrink: 0; transition: color .15s;
+}
+.sc-star:hover, .sc-star.starred { color: #f59e0b; }
+.sc-links { display: flex; flex-direction: column; gap: 6px; }
+.sc-link-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #64748b; }
+.sc-badge { font-size: 10.5px; font-weight: 600; background: #f1f5f9; color: #64748b; padding: 1px 7px; border-radius: 20px; }
+.sc-badge--green { background: #f0fdf4; color: #16a34a; }
+.sc-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 14px; border-top: 1px solid #f1f5f9; background: #f8fafc;
+}
+.sc-lead { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #64748b; }
+.sc-lead-av { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #475569; flex-shrink: 0; }
+.sc-board-tag { font-size: 11px; font-weight: 500; background: #eef2ff; color: #4f46e5; padding: 2px 8px; border-radius: 20px; }
 
-.project-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(9, 30, 66, 0.15) !important;
+/* Activity tabs */
+.activity-tabs { display: flex; gap: 0; border-bottom: 1px solid #e2e8f0; }
+.act-tab {
+  display: inline-flex; align-items: center; gap: 6px; padding: 10px 14px;
+  border: none; background: none; font-size: 12.5px; font-weight: 500; color: #64748b;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  border-bottom: 2px solid transparent; transition: color .12s, border-color .12s;
 }
+.act-tab:hover { color: #0f172a; }
+.act-tab.active { color: #4f46e5; border-bottom-color: #4f46e5; font-weight: 600; }
+.act-tab-badge { background: #e2e8f0; color: #64748b; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 20px; }
 
-.card-border-left {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 16px;
-  z-index: 1;
+/* Activity feed */
+.activity-feed { display: flex; flex-direction: column; gap: 2px; padding-top: 8px; }
+.act-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+  border-radius: 10px; cursor: pointer; animation: fadeUp .22s ease both;
+  transition: background .1s;
 }
+.act-item:hover { background: #f8fafc; }
+.act-icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.act-body { flex: 1; min-width: 0; }
+.act-text { font-size: 13px; color: #0f172a; margin-bottom: 2px; }
+.act-user { font-weight: 600; }
+.act-action { color: #64748b; }
+.act-link { color: #4f46e5; font-weight: 500; }
+.act-meta { font-size: 11px; color: #94a3b8; }
+.act-status-chip { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.chip-info    { background: #eff6ff; color: #2563eb; }
+.chip-success { background: #f0fdf4; color: #16a34a; }
+.chip-warn    { background: #fffbeb; color: #d97706; }
+.chip-grey    { background: #f1f5f9; color: #64748b; }
 
-.project-icon {
-  position: relative;
-  z-index: 2;
-  margin-left: -8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+/* Empty state */
+.empty-state { display: flex; flex-direction: column; align-items: center; padding: 40px 20px; gap: 12px; }
+.es-illustration { position: relative; width: 220px; height: 140px; margin-bottom: 8px; }
+.es-laptop { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); }
+.es-screen {
+  width: 160px; height: 96px; border-radius: 6px 6px 0 0;
+  border: 3px solid #b0bec5; border-bottom: none;
+  background: #f1f5f9; display: flex; overflow: hidden;
 }
+.es-sidebar { width: 22px; background: #3b4fd8; height: 100%; flex-shrink: 0; }
+.es-content { flex: 1; padding: 10px 8px; display: flex; flex-direction: column; gap: 6px; background: #fff; }
+.es-bar { height: 10px; border-radius: 4px; background: #e2e8f0; }
+.es-bar--dark { background: #a5b4fc; }
+.es-base { width: 200px; height: 10px; background: #78909c; border-radius: 0 0 6px 6px; }
+.es-badge {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 44px; height: 44px; border-radius: 50%;
+  background: linear-gradient(135deg, #10b981, #34d399);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(16,185,129,.3);
+}
+.es-toast {
+  position: absolute; bottom: 28px; right: 10px;
+  width: 44px; height: 14px; border-radius: 4px;
+  background: #34d399; opacity: .7;
+}
+.es-title { font-size: 15px; font-weight: 700; color: #0f172a; text-align: center; }
+.es-sub { font-size: 12.5px; color: #94a3b8; text-align: center; }
 
-/* Empty State Illustration Custom CSS */
-.success-badge {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 4;
-}
+.empty-simple { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px 20px; color: #94a3b8; font-size: 13px; }
 
-.laptop-screen {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 180px;
-  height: 110px;
-  z-index: 1;
-  border-top-left-radius: 6px !important;
-  border-top-right-radius: 6px !important;
-  border: 4px solid #b0bec5;
-  border-bottom: none;
-}
-
-.laptop-base {
-  position: absolute;
-  bottom: 0px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 240px;
-  height: 12px;
-  z-index: 2;
-  border-bottom-left-radius: 8px !important;
-  border-bottom-right-radius: 8px !important;
-}
-
-.notification-toast {
-  position: absolute;
-  bottom: 35px;
-  right: 25px;
-  width: 50px;
-  height: 16px;
-  z-index: 3;
-}
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 </style>
