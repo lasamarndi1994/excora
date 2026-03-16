@@ -24,39 +24,21 @@
         </div>
 
         <!-- Filter by type -->
-        <div class="ft-wrap" ref="filterWrapRef">
-          <button class="ft-btn" :class="{ active: typeFilter !== 'all' }" @click.stop="filterOpen = !filterOpen">
+        <div class="ft-wrap" ref="filterBtnRef">
+          <button class="ft-btn" :class="{ active: typeFilter !== 'all' }" @click.stop="toggleDropdown('filter', ($event.currentTarget as HTMLElement).closest('.ft-wrap') as HTMLElement)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M7 12h10M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             {{ typeFilter === 'all' ? 'Filter' : typeFilter }}
             <span v-if="typeFilter !== 'all'" class="ft-badge">1</span>
           </button>
-          <div v-if="filterOpen" class="ft-panel" @click.stop>
-            <div class="ft-panel-title">File type</div>
-            <div v-for="t in typeOptions" :key="t.value" class="ft-radio-row"
-              :class="{ active: typeFilter === t.value }"
-              @click="typeFilter = t.value; filterOpen = false">
-              <span class="ft-radio" :class="{ checked: typeFilter === t.value }"></span>
-              {{ t.label }}
-            </div>
-          </div>
         </div>
 
         <!-- Sort -->
-        <div class="ft-wrap" ref="sortWrapRef">
-          <button class="ft-btn" :class="{ active: sortBy !== 'date-desc' }" @click.stop="sortOpen = !sortOpen">
+        <div class="ft-wrap" ref="sortBtnRef">
+          <button class="ft-btn" :class="{ active: sortBy !== 'date-desc' }" @click.stop="toggleDropdown('sort', ($event.currentTarget as HTMLElement).closest('.ft-wrap') as HTMLElement)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M7 12h10M11 18h2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             Sort
             <span v-if="sortBy !== 'date-desc'" class="ft-badge-text">· {{ sortOptions.find(s=>s.value===sortBy)?.label }}</span>
           </button>
-          <div v-if="sortOpen" class="ft-panel" @click.stop>
-            <div class="ft-panel-title">Sort by</div>
-            <div v-for="s in sortOptions" :key="s.value" class="ft-radio-row"
-              :class="{ active: sortBy === s.value }"
-              @click="sortBy = s.value; sortOpen = false">
-              <span class="ft-radio" :class="{ checked: sortBy === s.value }"></span>
-              {{ s.label }}
-            </div>
-          </div>
         </div>
       </div>
 
@@ -73,9 +55,11 @@
       @dragover.prevent="dragging = true"
       @dragleave.prevent="dragging = false"
       @drop.prevent="handleDrop">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" style="color:#94a3b8;margin-bottom:8px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-      <div class="dz-title">{{ dragging ? 'Release to upload' : 'Drop files here to upload' }}</div>
-      <div class="dz-sub">Supports all file types · Max 100 MB per file</div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="color:#94a3b8;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <div>
+        <div class="dz-title">{{ dragging ? 'Release to upload' : 'Drop files here to upload' }}</div>
+        <div class="dz-sub">Supports all file types · Max 100 MB per file</div>
+      </div>
     </div>
 
     <!-- Section label + count -->
@@ -170,7 +154,30 @@
       </table>
     </div>
 
+    <!-- Teleported dropdowns (fixed position, never clipped) -->
+    <Teleport to="body">
+      <div v-if="openDropdown === 'filter'" class="ft-panel-fixed" :style="dropdownStyle" @click.stop>
+        <div class="ft-panel-title">File type</div>
+        <div v-for="t in typeOptions" :key="t.value" class="ft-radio-row"
+          :class="{ active: typeFilter === t.value }"
+          @click="typeFilter = t.value; openDropdown = null">
+          <span class="ft-radio" :class="{ checked: typeFilter === t.value }"></span>
+          {{ t.label }}
+        </div>
+      </div>
+      <div v-if="openDropdown === 'sort'" class="ft-panel-fixed" :style="dropdownStyle" @click.stop>
+        <div class="ft-panel-title">Sort by</div>
+        <div v-for="s in sortOptions" :key="s.value" class="ft-radio-row"
+          :class="{ active: sortBy === s.value }"
+          @click="sortBy = s.value; openDropdown = null">
+          <span class="ft-radio" :class="{ checked: sortBy === s.value }"></span>
+          {{ s.label }}
+        </div>
+      </div>
+    </Teleport>
+
     <!-- Context menu -->
+    <Teleport to="body">
     <div v-if="ctxMenu.open" class="ctx-menu"
       :style="{ top: ctxMenu.y + 'px', left: ctxMenu.x + 'px' }"
       @click.stop>
@@ -196,6 +203,7 @@
         Delete
       </button>
     </div>
+    </Teleport>
 
     <!-- Rename modal -->
     <div v-if="renaming" class="modal-overlay" @click.self="renaming = null">
@@ -284,7 +292,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 
 interface FileItem {
   id: number; name: string; ext: string; size: string; date: string
@@ -298,9 +306,28 @@ const dragging    = ref(false)
 const searchQuery = ref('')
 const typeFilter  = ref('all')
 const sortBy      = ref('date-desc')
-const filterOpen  = ref(false)
-const sortOpen    = ref(false)
+const filterOpen  = ref(false) // kept for compat, unused
+const sortOpen    = ref(false) // kept for compat, unused
 const preview     = ref<FileItem | null>(null)
+
+// ── Fixed-position dropdown (teleported, never clipped) ──
+const openDropdown  = ref<'filter' | 'sort' | null>(null)
+const dropdownStyle = ref({ top: '0px', left: '0px' })
+const filterBtnRef  = ref<HTMLElement | null>(null)
+const sortBtnRef    = ref<HTMLElement | null>(null)
+
+function toggleDropdown(name: 'filter' | 'sort', el: HTMLElement | null) {
+  if (openDropdown.value === name) { openDropdown.value = null; return }
+  if (el) {
+    const r = el.getBoundingClientRect()
+    dropdownStyle.value = { top: (r.bottom + 6) + 'px', left: r.left + 'px' }
+  }
+  openDropdown.value = name
+}
+
+function onDocClick() { openDropdown.value = null }
+onMounted(() => document.addEventListener('mousedown', onDocClick))
+onUnmounted(() => document.removeEventListener('mousedown', onDocClick))
 const renaming    = ref<FileItem | null>(null)
 const renameValue = ref('')
 const renameInputRef = ref<HTMLInputElement | null>(null)
@@ -379,6 +406,7 @@ function closeMenus() {
   ctxMenu.value.open = false
   filterOpen.value = false
   sortOpen.value = false
+  openDropdown.value = null
 }
 
 // ── Preview ──
@@ -481,10 +509,10 @@ function showToast(msg: string) {
 
 <style scoped>
 /* ── Root ── */
-.files-root { display: flex; flex-direction: column; gap: 12px; padding: 16px 20px; font-family: 'Inter', sans-serif; font-size: 13px; color: #1e293b; min-height: 0; flex: 1; position: relative; }
+.files-root { display: flex; flex-direction: column; gap: 0; padding: 0; font-family: 'Inter', sans-serif; font-size: 13px; color: #1e293b; min-height: 0; flex: 1; overflow-y: auto; overflow-x: hidden; }
 
 /* ── Toolbar ── */
-.files-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.files-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 10px 20px; background: #fff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 50; flex-shrink: 0; }
 .ft-left { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 
 /* ── View toggle ── */
@@ -507,6 +535,7 @@ function showToast(msg: string) {
 .ft-badge-text { font-size: 10.5px; color: #4f46e5; font-weight: 600; }
 
 .ft-panel { position: absolute; top: calc(100% + 6px); left: 0; z-index: 400; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12); min-width: 180px; padding: 6px; }
+.ft-panel-fixed { position: fixed; z-index: 9999; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.15); min-width: 180px; padding: 6px; }
 .ft-panel-title { font-size: 10.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; padding: 4px 8px 6px; }
 .ft-radio-row { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 7px; cursor: pointer; font-size: 12.5px; color: #374151; transition: background .1s; }
 .ft-radio-row:hover, .ft-radio-row.active { background: #f8fafc; }
@@ -518,22 +547,22 @@ function showToast(msg: string) {
 .upload-btn:hover { background: #f8fafc; border-color: #a5b4fc; color: #4f46e5; }
 
 /* ── Drop zone ── */
-.drop-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; border: 2px dashed #e2e8f0; border-radius: 12px; background: #f8fafc; transition: border-color .15s, background .15s; text-align: center; }
+.drop-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 14px 20px; border: 2px dashed #e2e8f0; border-radius: 10px; background: #f8fafc; transition: border-color .15s, background .15s; text-align: center; margin: 12px 20px 0; flex-direction: row; gap: 10px; }
 .drop-zone.active { border-color: #a5b4fc; background: #eef2ff; }
-.dz-title { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 3px; }
+.dz-title { font-size: 12.5px; font-weight: 600; color: #475569; }
 .dz-sub { font-size: 11.5px; color: #94a3b8; }
 
 /* ── Section label ── */
-.section-label { font-size: 11.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; }
+.section-label { font-size: 11.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .05em; padding: 12px 20px 6px; }
 .section-label-sub { font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 6px; }
 
 /* ── Empty state ── */
-.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 48px 20px; text-align: center; }
+.empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 48px 20px; text-align: center; flex: 1; }
 .empty-title { font-size: 14px; font-weight: 600; color: #475569; }
 .empty-sub { font-size: 12.5px; color: #94a3b8; }
 
 /* ── Grid ── */
-.file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; padding: 0 20px 20px; }
 .fg-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 12px 10px; cursor: pointer; animation: fadeUp .22s ease both; transition: border-color .15s, box-shadow .15s, transform .15s; position: relative; }
 .fg-card:hover { border-color: #a5b4fc; box-shadow: 0 4px 14px rgba(79,70,229,.08); transform: translateY(-2px); }
 .fg-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
@@ -546,7 +575,7 @@ function showToast(msg: string) {
 .fa-btn:hover { background: #eef2ff; color: #4f46e5; }
 
 /* ── List ── */
-.file-list-wrap { overflow-x: auto; }
+.file-list-wrap { overflow-x: auto; padding: 0 20px 20px; }
 .file-table { width: 100%; border-collapse: collapse; }
 .file-table th { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .04em; padding: 6px 12px; text-align: left; border-bottom: 1px solid #f1f5f9; white-space: nowrap; }
 .th-sortable { cursor: pointer; user-select: none; }
