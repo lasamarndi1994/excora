@@ -522,7 +522,7 @@ function autoResize(e: Event) { const el = e.target as HTMLTextAreaElement; el.s
 .dd-divider { height: 1px; background: #f1f5f9; margin: 4px 0; }
 
 /* ── Panel overlay ── */
-.panel-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.25); z-index: 500; display: flex; justify-content: flex-end; }
+.panel-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.25); z-index: 1100; display: flex; justify-content: flex-end; }
 .panel { width: 480px; max-width: 95vw; background: #fff; height: 100%; box-shadow: -6px 0 32px rgba(0,0,0,.14); display: flex; flex-direction: column; overflow: hidden; }
 .panel-slide-enter-active, .panel-slide-leave-active { transition: transform .22s ease; }
 .panel-slide-enter-from, .panel-slide-leave-to { transform: translateX(100%); }

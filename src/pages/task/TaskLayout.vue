@@ -32,7 +32,7 @@
         </button>
       </div>
 
-      <div v-if="showToolbar" class="tl-toolbar">
+      <div v-if="showToolbar" class="tl-toolbar" ref="toolbarRef">
 
         <!-- Filter -->
         <div class="tb-wrap" ref="filterWrapRef">
@@ -43,11 +43,11 @@
           </button>
           <div v-if="openPanel === 'filter'" class="tb-panel" @click.stop>
             <div class="tb-panel-title">Filter by</div>
-            <label v-for="f in filterOptions" :key="f.value" class="tb-check-row">
+            <label v-for="f in filterOptions" :key="f.value" class="tb-check-row" @click="toggleFilter(f.value)">
               <span class="tb-checkbox" :class="{ checked: activeFilters.includes(f.value) }">
                 <svg v-if="activeFilters.includes(f.value)" width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </span>
-              <span @click="toggleFilter(f.value)">{{ f.label }}</span>
+              <span>{{ f.label }}</span>
             </label>
             <div class="tb-panel-divider"></div>
             <button class="tb-clear" @click="activeFilters = []">Clear filters</button>
@@ -63,7 +63,7 @@
           </button>
           <div v-if="openPanel === 'sort'" class="tb-panel" @click.stop>
             <div class="tb-panel-title">Sort by</div>
-            <div v-for="s in sortOptions" :key="s.value" class="tb-radio-row" @click="sortBy = s.value; openPanel = null">
+            <div v-for="s in sortOptions" :key="s.value" class="tb-radio-row" @click="sortBy = s.value">
               <span class="tb-radio" :class="{ checked: sortBy === s.value }"></span>
               {{ s.label }}
             </div>
@@ -79,7 +79,7 @@
           </button>
           <div v-if="openPanel === 'group'" class="tb-panel" @click.stop>
             <div class="tb-panel-title">Group by</div>
-            <div v-for="g in groupOptions" :key="g.value" class="tb-radio-row" @click="groupBy = g.value; openPanel = null">
+            <div v-for="g in groupOptions" :key="g.value" class="tb-radio-row" @click="groupBy = g.value">
               <span class="tb-radio" :class="{ checked: groupBy === g.value }"></span>
               {{ g.label }}
             </div>
@@ -168,14 +168,11 @@
       <router-view />
     </div>
 
-    <!-- Global backdrop to close panels -->
-    <div v-if="openPanel" class="tl-backdrop" @click="openPanel = null"></div>
-
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import {
   activeFilters, sortBy, groupBy, searchQuery,
@@ -186,9 +183,24 @@ import {
 defineEmits(['add-task'])
 
 const route = useRoute()
-const openPanel   = ref<string | null>(null)
-const searchOpen  = ref(false)
+const openPanel      = ref<string | null>(null)
+const searchOpen     = ref(false)
 const searchInputRef = ref<HTMLInputElement | null>(null)
+const toolbarRef     = ref<HTMLElement | null>(null)
+
+function togglePanel(name: string) {
+  openPanel.value = openPanel.value === name ? null : name
+}
+
+function onDocMousedown(e: MouseEvent) {
+  // close only if click is outside the entire toolbar area
+  if (toolbarRef.value && !toolbarRef.value.contains(e.target as Node)) {
+    openPanel.value = null
+  }
+}
+
+onMounted(() => document.addEventListener('mousedown', onDocMousedown))
+onUnmounted(() => document.removeEventListener('mousedown', onDocMousedown))
 
 const tabs = [
   { value: 'list',      label: 'List',      path: '/tasks/list',      svg: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>' },
@@ -207,10 +219,6 @@ const showToolbar = computed(() => ['list', 'board'].includes(activeTab.value))
 
 // injected from child via provide/inject or just a placeholder
 const totalTasks = ref(11)
-
-function togglePanel(name: string) {
-  openPanel.value = openPanel.value === name ? null : name
-}
 </script>
 
 <style scoped>
@@ -337,6 +345,4 @@ function togglePanel(name: string) {
 
 .tl-body { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
 .tl-body > * { flex: 1; min-height: 0; }
-
-.tl-backdrop { position: fixed; inset: 0; z-index: 399; }
 </style>
