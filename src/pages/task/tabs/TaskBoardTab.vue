@@ -39,11 +39,20 @@
         </div>
       </div>
 
-      <div class="col-body">
+      <div class="col-body"
+        @dragover.prevent="onColDragOver(col.id, $event)"
+        @dragleave="onColDragLeave(col.id)"
+        @drop.prevent="onDrop(col.id, $event)">
         <div v-for="(task, i) in visibleTasks(col.tasks)" :key="task.id"
-          class="b-card" :class="{ 'b-card--done': task.done }"
+          class="b-card" :class="{ 'b-card--done': task.done, 'b-card--dragging': dragState.taskId === task.id }"
           :style="{ animationDelay: i * 40 + 'ms' }"
+          draggable="true"
+          @dragstart="onDragStart(task, col.id, $event)"
+          @dragend="onDragEnd"
+          @dragover.prevent="onCardDragOver(col.id, task.id, $event)"
           @click.stop="openTask(task)">
+          <!-- drop indicator above card -->
+          <div v-if="dropIndicator.colId === col.id && dropIndicator.beforeTaskId === task.id" class="drop-line"></div>
           <div class="bc-top">
             <button class="check-btn" :class="{ done: task.done }" @click.stop="toggleDone(task)">
               <svg v-if="task.done" width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#10b981"/><path d="M8 12l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -81,6 +90,9 @@
             <button class="btn-cancel" @click.stop="addingIn = null; newTaskName = ''">Cancel</button>
           </div>
         </div>
+
+        <!-- drop indicator at bottom of column -->
+        <div v-if="dropIndicator.colId === col.id && dropIndicator.beforeTaskId === null" class="drop-line"></div>
 
         <button class="col-add" @click.stop="addTask(col.id)">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
@@ -349,6 +361,86 @@ const newComment     = ref('')
 const collabPickerOpen = ref(false)
 const addInputRef    = ref<HTMLInputElement | null>(null)
 
+// ── Drag & Drop state ──
+const dragState = reactive({ taskId: -1, fromColId: '' })
+const dropIndicator = reactive({ colId: '', beforeTaskId: null as number | null })
+
+function onDragStart(task: Task, colId: string, e: DragEvent) {
+  dragState.taskId = task.id
+  dragState.fromColId = colId
+  e.dataTransfer!.effectAllowed = 'move'
+  e.dataTransfer!.setData('text/plain', String(task.id))
+  // slight delay so the ghost image renders before we hide the card
+  setTimeout(() => {}, 0)
+}
+
+function onDragEnd() {
+  dragState.taskId = -1
+  dragState.fromColId = ''
+  dropIndicator.colId = ''
+  dropIndicator.beforeTaskId = null
+}
+
+function onColDragOver(colId: string, e: DragEvent) {
+  e.preventDefault()
+  // If hovering the empty space below all cards, show indicator at bottom
+  dropIndicator.colId = colId
+  dropIndicator.beforeTaskId = null
+}
+
+function onColDragLeave(colId: string) {
+  if (dropIndicator.colId === colId) {
+    dropIndicator.colId = ''
+    dropIndicator.beforeTaskId = null
+  }
+}
+
+function onCardDragOver(colId: string, taskId: number, e: DragEvent) {
+  e.stopPropagation()
+  const el = (e.currentTarget as HTMLElement)
+  const rect = el.getBoundingClientRect()
+  const midY = rect.top + rect.height / 2
+  dropIndicator.colId = colId
+  // if cursor is in top half → insert before this card; bottom half → insert before next
+  dropIndicator.beforeTaskId = e.clientY < midY ? taskId : getNextTaskId(colId, taskId)
+}
+
+function getNextTaskId(colId: string, taskId: number): number | null {
+  const col = columns.find(c => c.id === colId)
+  if (!col) return null
+  const idx = col.tasks.findIndex(t => t.id === taskId)
+  return col.tasks[idx + 1]?.id ?? null
+}
+
+function onDrop(colId: string, e: DragEvent) {
+  e.preventDefault()
+  const taskId = Number(e.dataTransfer!.getData('text/plain'))
+  if (!taskId) return
+
+  const fromCol = columns.find(c => c.id === dragState.fromColId)
+  const toCol   = columns.find(c => c.id === colId)
+  if (!fromCol || !toCol) return
+
+  const taskIdx = fromCol.tasks.findIndex(t => t.id === taskId)
+  if (taskIdx === -1) return
+  const removed = fromCol.tasks.splice(taskIdx, 1)
+  const task = removed[0]
+  if (!task) return
+
+  const beforeId = dropIndicator.beforeTaskId
+  if (beforeId === null) {
+    toCol.tasks.push(task)
+  } else {
+    const insertIdx = toCol.tasks.findIndex(t => t.id === beforeId)
+    toCol.tasks.splice(insertIdx === -1 ? toCol.tasks.length : insertIdx, 0, task)
+  }
+
+  dropIndicator.colId = ''
+  dropIndicator.beforeTaskId = null
+  dragState.taskId = -1
+  dragState.fromColId = ''
+}
+
 const tagMap: Record<string, [string, string]> = {
   green: ['#f0fdf4','#16a34a'], blue: ['#eff6ff','#2563eb'],
   red:   ['#fef2f2','#ef4444'], amber: ['#fffbeb','#d97706'],
@@ -484,9 +576,17 @@ function autoResize(e: Event) { const el = e.target as HTMLTextAreaElement; el.s
 .col-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px; display: flex; flex-direction: column; gap: 6px; min-height: 0; }
 
 /* ── Card ── */
-.b-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; padding: 10px 11px; cursor: pointer; animation: fadeUp .22s ease both; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.b-card { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; padding: 10px 11px; cursor: grab; animation: fadeUp .22s ease both; transition: border-color .15s, box-shadow .15s, transform .15s; position: relative; }
 .b-card:hover { border-color: #a5b4fc; box-shadow: 0 4px 14px rgba(79,70,229,.08); transform: translateY(-1px); }
 .b-card--done { opacity: .65; }
+.b-card--dragging { opacity: .35; border-color: #a5b4fc; box-shadow: none; transform: none; cursor: grabbing; }
+
+/* ── Drop indicator ── */
+.drop-line { height: 2px; background: #4f46e5; border-radius: 2px; margin: 2px 0; box-shadow: 0 0 6px rgba(79,70,229,.4); animation: dropLinePulse .6s ease infinite alternate; }
+@keyframes dropLinePulse { from { opacity: .7; } to { opacity: 1; } }
+
+/* ── Column drop highlight ── */
+.col-body.drag-over { background: #f5f3ff; }
 .bc-top { display: flex; align-items: flex-start; gap: 7px; margin-bottom: 6px; }
 .check-btn { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; border: none; background: none; cursor: pointer; flex-shrink: 0; transition: opacity .15s; margin-top: 1px; }
 .check-btn:hover { opacity: .75; }
