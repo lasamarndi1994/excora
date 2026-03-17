@@ -129,21 +129,21 @@ const projects = ref([
 .s-divider { height: 1px; background: #f1f5f9; margin: 0 12px; }
 
 /* Nav section */
-.nav-section { padding: 8px; }
+.nav-section { padding: 10px 8px; }
 .section-heading {
-  font-size: 10.5px; font-weight: 700; color: #94a3b8;
-  text-transform: uppercase; letter-spacing: .07em;
-  padding: 6px 8px 4px;
+  font-size: 10px; font-weight: 700; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: .08em;
+  padding: 4px 8px 8px;
 }
 
 /* Nav item */
 .nav-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 7px 10px; border-radius: 8px;
-  font-size: 14.5px; font-weight: 500; color: #475569;
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; color: #475569;
   text-decoration: none; cursor: pointer;
   transition: background .12s, color .12s;
-  margin-bottom: 1px;
+  margin-bottom: 3px;
 }
 .nav-item:hover { background: #f8fafc; color: #1e293b; }
 .nav-item.active { background: #ede9fe; color: #4f46e5; font-weight: 600; }
@@ -155,7 +155,7 @@ const projects = ref([
 .nav-label { flex: 1; }
 
 .nav-badge {
-  font-size: 10.5px; font-weight: 700;
+  font-size: 10px; font-weight: 700;
   background: #4f46e5; color: #fff;
   padding: 1px 6px; border-radius: 20px; min-width: 18px; text-align: center;
 }
