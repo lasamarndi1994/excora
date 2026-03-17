@@ -24,7 +24,7 @@
             <div class="drawer-divider"></div>
 
             <!-- Body -->
-            <div class="drawer-body">
+            <div class="drawer-body" ref="drawerBodyRef">
 
               <!-- Issue Type -->
               <div class="section">
@@ -88,21 +88,34 @@
                 </div>
 
                 <!-- Assignee -->
-                <div class="field-row">
+                <div class="field-row" style="position:relative">
                   <div class="field-label">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="#94a3b8" stroke-width="2"/></svg>
                     Assignee
                   </div>
-                  <div class="field-value assignee-value">
-                    <div class="assignee-avatars">
-                      <img v-for="(uid, i) in form.assignees.slice(0,3)" :key="uid"
-                        :src="store.users.find(u=>u.id===uid)?.avatar"
-                        class="assignee-avatar" :style="`z-index:${3-i}`" />
-                      <span v-if="form.assignees.length > 3" class="assignee-more">+{{ form.assignees.length - 3 }}</span>
+                  <div class="field-value">
+                    <!-- Selected tag -->
+                    <div v-if="selectedAssignee" class="assignee-tag">
+                      <img :src="selectedAssignee.avatar" class="assignee-tag-av" />
+                      <span class="assignee-tag-name">{{ selectedAssignee.name }}</span>
+                      <button class="assignee-tag-rm" @click.stop="form.assigneeId = ''" title="Remove">×</button>
                     </div>
-                    <select v-model="form.assignees" multiple class="field-select assignee-select">
-                      <option v-for="u in store.users" :key="u.id" :value="u.id">{{ u.name }}</option>
-                    </select>
+                    <!-- Picker trigger -->
+                    <button v-else class="assignee-pick-btn" @click.stop="assigneeDdOpen = !assigneeDdOpen">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                      Assign
+                    </button>
+                    <!-- Dropdown -->
+                    <div v-if="assigneeDdOpen" class="assignee-dd" @click.stop>
+                      <div v-for="u in store.users" :key="u.id"
+                        class="assignee-dd-row"
+                        :class="{ active: form.assigneeId === u.id }"
+                        @click="form.assigneeId = u.id; assigneeDdOpen = false">
+                        <img :src="u.avatar" class="assignee-dd-av" />
+                        <span>{{ u.name }}</span>
+                        <svg v-if="form.assigneeId === u.id" width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-left:auto"><path d="M5 13l4 4L19 7" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round"/></svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -161,9 +174,105 @@
                         <button class="tag-remove" @click="form.tags.splice(i,1)">×</button>
                       </span>
                     </div>
-                    <input class="tag-input" placeholder="Add tag…" @keydown.enter.prevent="addTag" @keydown.comma.prevent="addTag" ref="tagInputRef" />
+                    <input class="tag-input" placeholder="Add tag…" @keydown.enter.prevent="addTag" @keydown.comma.prevent="addTag" />
                   </div>
                 </div>
+
+                <!-- More fields (hidden by default) -->
+                <template v-if="showMoreFields">
+
+                  <!-- Reporter -->
+                  <div class="field-row">
+                    <div class="field-label">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="#94a3b8" stroke-width="2"/></svg>
+                      Reporter
+                    </div>
+                    <div class="field-value">
+                      <div class="assignee-tag">
+                        <img :src="store.currentUser.avatar" class="assignee-tag-av" />
+                        <span class="assignee-tag-name" style="color:#374151">{{ store.currentUser.name }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Labels -->
+                  <div class="field-row" style="position:relative">
+                    <div class="field-label">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Labels
+                    </div>
+                    <div class="field-value tags-value">
+                      <div class="tags-list">
+                        <span v-for="(lbl, i) in form.labels" :key="i" class="tag-chip tag-chip--label">
+                          {{ lbl }}<button class="tag-remove" @click="form.labels.splice(i,1)">×</button>
+                        </span>
+                      </div>
+                      <div style="position:relative">
+                        <button class="assignee-pick-btn" @click.stop="labelDdOpen = !labelDdOpen">+ Add label</button>
+                        <div v-if="labelDdOpen" class="assignee-dd" @click.stop style="left:0">
+                          <div v-for="lbl in availableLabels" :key="lbl"
+                            class="assignee-dd-row"
+                            :class="{ active: form.labels.includes(lbl) }"
+                            @click="toggleLabel(lbl)">
+                            <span>{{ lbl }}</span>
+                            <svg v-if="form.labels.includes(lbl)" width="12" height="12" viewBox="0 0 24 24" fill="none" style="margin-left:auto"><path d="M5 13l4 4L19 7" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round"/></svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Components -->
+                  <div class="field-row">
+                    <div class="field-label">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Components
+                    </div>
+                    <div class="field-value">
+                      <select v-model="form.component" class="field-select">
+                        <option value="">None</option>
+                        <option v-for="c in componentOptions" :key="c" :value="c">{{ c }}</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Fix versions -->
+                  <div class="field-row">
+                    <div class="field-label">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Fix versions
+                    </div>
+                    <div class="field-value">
+                      <select v-model="form.fixVersion" class="field-select">
+                        <option value="">None</option>
+                        <option v-for="v in versionOptions" :key="v" :value="v">{{ v }}</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Original estimate -->
+                  <div class="field-row">
+                    <div class="field-label">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#94a3b8" stroke-width="2"/><polyline points="12 6 12 12 16 14" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/></svg>
+                      Original est.
+                    </div>
+                    <div class="field-value">
+                      <input v-model="form.originalEstimate" class="field-text-input" placeholder="e.g. 2h 30m" />
+                    </div>
+                  </div>
+
+                  <!-- Due date -->
+                  <div class="field-row">
+                    <div class="field-label">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="#94a3b8" stroke-width="2"/><line x1="16" y1="2" x2="16" y2="6" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="2" x2="8" y2="6" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="10" x2="21" y2="10" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/></svg>
+                      Due date
+                    </div>
+                    <div class="field-value">
+                      <input v-model="form.dueDate" type="date" class="field-text-input" />
+                    </div>
+                  </div>
+
+                </template>
 
               </div>
 
@@ -184,9 +293,9 @@
             <!-- Footer -->
             <div class="drawer-divider"></div>
             <div class="drawer-footer">
-              <button class="btn-ghost">
+              <button class="btn-ghost" @click="toggleMoreFields">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/></svg>
-                More fields
+                {{ showMoreFields ? 'Fewer fields' : 'More fields' }}
               </button>
               <div class="footer-actions">
                 <button class="btn-ghost" @click="$emit('update:modelValue', false)">Cancel</button>
@@ -203,7 +312,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { useTaskStore } from '@/stores/taskStore'
 import QuillEditor from '@/components/QuillEditor.vue'
 
@@ -211,7 +320,6 @@ defineProps<{ modelValue: boolean }>()
 const emit = defineEmits(['update:modelValue'])
 
 const store = useTaskStore()
-const tagInputRef = ref<HTMLInputElement | null>(null)
 
 const issueTypes: { value: 'Story' | 'Task' | 'Bug' | 'Epic'; label: string; dotColor: string }[] = [
   { value: 'Story', label: 'Story', dotColor: '#22c55e' },
@@ -232,20 +340,53 @@ const priorityOptions = [
   { value: 'Low',    label: 'Low'    },
 ]
 
+const assigneeDdOpen  = ref(false)
+const labelDdOpen     = ref(false)
+const showMoreFields  = ref(false)
+const drawerBodyRef   = ref<HTMLElement | null>(null)
+
+const availableLabels   = ['frontend', 'backend', 'design', 'bug', 'enhancement', 'documentation', 'urgent']
+const componentOptions  = ['UI', 'API', 'Database', 'Auth', 'Payments', 'Notifications']
+const versionOptions    = ['v1.0', 'v1.1', 'v2.0', 'v2.1-beta']
+
 const defaultForm = () => ({
   summary: '',
   description: '',
   type: 'Story' as 'Story' | 'Task' | 'Bug' | 'Epic',
   status: 'TODO' as 'TODO' | 'IN_PROGRESS' | 'DONE',
   priority: 'Medium' as 'High' | 'Medium' | 'Low',
-  assignees: [] as string[],
+  assigneeId: '' as string,
   sprintId: '',
   epicLink: '',
   storyPoints: '',
   tags: [] as string[],
+  labels: [] as string[],
+  component: '',
+  fixVersion: '',
+  originalEstimate: '',
+  dueDate: '',
 })
 
 const form = reactive(defaultForm())
+
+const selectedAssignee = computed(() => store.users.find(u => u.id === form.assigneeId) ?? null)
+
+function toggleMoreFields() {
+  showMoreFields.value = !showMoreFields.value
+  if (showMoreFields.value) {
+    // scroll to show the new fields after they render
+    setTimeout(() => {
+      if (drawerBodyRef.value) {
+        drawerBodyRef.value.scrollTo({ top: drawerBodyRef.value.scrollHeight, behavior: 'smooth' })
+      }
+    }, 50)
+  }
+}
+
+function toggleLabel(lbl: string) {
+  const i = form.labels.indexOf(lbl)
+  i === -1 ? form.labels.push(lbl) : form.labels.splice(i, 1)
+}
 
 function addTag(e: KeyboardEvent) {
   const val = (e.target as HTMLInputElement).value.trim().replace(/,$/, '')
@@ -261,7 +402,7 @@ function handleCreate(addAnother: boolean) {
     type: form.type,
     status: form.status,
     priority: form.priority,
-    assignees: store.users.filter(u => form.assignees.includes(u.id)),
+    assignees: form.assigneeId ? [store.users.find(u => u.id === form.assigneeId)!].filter(Boolean) : [],
     sprintId: form.sprintId || undefined,
     epicLink: form.epicLink || undefined,
   })
@@ -381,18 +522,24 @@ function handleCreate(addAnother: boolean) {
   outline: none; cursor: pointer; padding: 4px 0;
 }
 
-/* Assignee */
-.assignee-value { display: flex; align-items: center; gap: 8px; }
-.assignee-avatars { display: flex; }
-.assignee-avatar {
-  width: 24px; height: 24px; border-radius: 50%;
-  border: 2px solid #fff; margin-left: -6px; object-fit: cover;
-}
-.assignee-avatars .assignee-avatar:first-child { margin-left: 0; }
-.assignee-more { font-size: 11px; color: #64748b; margin-left: 4px; }
-.assignee-select { max-width: 160px; }
+/* Assignee tag picker */
+.assignee-tag { display: inline-flex; align-items: center; gap: 6px; padding: 3px 6px 3px 4px; border-radius: 20px; background: #eef2ff; border: 1px solid #c7d2fe; }
+.assignee-tag-av { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.assignee-tag-name { font-size: 12.5px; font-weight: 500; color: #4f46e5; }
+.assignee-tag-rm { border: none; background: none; color: #a5b4fc; cursor: pointer; font-size: 15px; line-height: 1; padding: 0; display: flex; align-items: center; }
+.assignee-tag-rm:hover { color: #4f46e5; }
+.assignee-pick-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 6px; border: none; background: none; font-size: 12.5px; color: #94a3b8; cursor: pointer; font-family: 'Inter', sans-serif; transition: background .12s, color .12s; }
+.assignee-pick-btn:hover { background: #f1f5f9; color: #475569; }
+.assignee-dd { position: absolute; top: 100%; left: 130px; z-index: 600; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.13); min-width: 200px; padding: 4px; }
+.assignee-dd-row { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 7px; cursor: pointer; font-size: 12.5px; color: #374151; transition: background .1s; }
+.assignee-dd-row:hover, .assignee-dd-row.active { background: #f5f3ff; }
+.assignee-dd-av { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 
-/* Tags */
+.tag-chip--label { background: #f0fdf4; color: #16a34a; }
+
+/* Extra field text input */
+.field-text-input { border: none; background: transparent; font-size: 13px; color: #1e293b; font-family: 'Inter', sans-serif; outline: none; padding: 4px 0; width: 100%; }
+.field-text-input::placeholder { color: #cbd5e1; }
 .tags-value { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; padding: 4px 0; }
 .tags-list { display: flex; flex-wrap: wrap; gap: 4px; }
 .tag-chip {
