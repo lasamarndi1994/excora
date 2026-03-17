@@ -1,0 +1,64 @@
+<template>
+    <v-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" max-width="500" scroll-strategy="none">
+        <v-card class="rounded-lg pa-4">
+            <v-card-title class="text-h6 font-weight-bold px-4 pt-2">Edit Sprint</v-card-title>
+            <v-card-text class="pt-4">
+                <v-text-field v-model="formData.name" label="Sprint Name" variant="outlined" density="comfortable"
+                    class="mb-2"></v-text-field>
+                <v-select v-model="formData.status" :items="['Draft', 'Active', 'Completed']" label="Status"
+                    variant="outlined" density="comfortable" class="mb-2"></v-select>
+                <v-row>
+                    <v-col cols="6">
+                        <v-text-field v-model="formData.startDate" label="Start Date" variant="outlined"
+                            density="comfortable" placeholder="e.g. Jan 1, 2024"></v-text-field>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-text-field v-model="formData.endDate" label="End Date" variant="outlined"
+                            density="comfortable" placeholder="e.g. Jan 14, 2024"></v-text-field>
+                    </v-col>
+                </v-row>
+            </v-card-text>
+            <v-card-actions class="px-4 pb-2">
+                <v-spacer></v-spacer>
+                <v-btn variant="text" class="text-none" @click="$emit('update:modelValue', false)">Cancel</v-btn>
+                <v-btn color="primary" variant="flat" class="text-none px-4" @click="save">Save</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+</template>
+
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import type { Sprint } from '@/stores/taskStore'
+
+const props = defineProps<{
+    modelValue: boolean
+    sprint: Sprint | null
+}>()
+
+const emit = defineEmits<{
+    (e: 'update:modelValue', value: boolean): void
+    (e: 'save', id: string, data: Partial<Sprint>): void
+}>()
+
+const formData = ref<Partial<Sprint>>({})
+
+watch(() => props.sprint, (newSprint) => {
+    if (newSprint) {
+        formData.value = {
+            name: newSprint.name,
+            status: newSprint.status,
+            startDate: newSprint.startDate,
+            endDate: newSprint.endDate
+        }
+    } else {
+        formData.value = {}
+    }
+}, { immediate: true })
+
+const save = () => {
+    if (props.sprint && formData.value.name) {
+        emit('save', props.sprint.id, formData.value)
+    }
+}
+</script>
