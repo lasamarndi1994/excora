@@ -183,7 +183,7 @@ function saveEdit(id: string, payload: Partial<Decision>) {
 
 /* Header */
 .dec-header {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
   padding: 16px 24px 12px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;
 }
 .dec-title { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 3px; }
@@ -199,7 +199,7 @@ function saveEdit(id: string, payload: Partial<Decision>) {
 
 /* Toolbar */
 .dec-toolbar {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
   padding: 10px 24px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; gap: 12px;
 }
 .search-wrap { position: relative; }
@@ -211,7 +211,7 @@ function saveEdit(id: string, payload: Partial<Decision>) {
   transition: border-color .15s, box-shadow .15s;
 }
 .search-input:focus { border-color: #a5b4fc; box-shadow: 0 0 0 3px rgba(99,102,241,.1); }
-.toolbar-right { display: flex; align-items: center; gap: 6px; }
+.toolbar-right { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .tool-btn {
   display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px;
   border-radius: 7px; border: 1px solid #e2e8f0; background: #fff;
@@ -225,8 +225,8 @@ function saveEdit(id: string, payload: Partial<Decision>) {
 .sf-btn.active { background: #eef2ff; color: #4f46e5; font-weight: 600; }
 
 /* Table */
-.dec-table-wrap { flex: 1; overflow-y: auto; padding: 16px 24px 0; }
-.dec-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; }
+.dec-table-wrap { flex: 1; overflow: auto; padding: 16px 24px 0; }
+.dec-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; min-width: 700px; }
 .dec-table thead th {
   padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600;
   color: #94a3b8; background: #f8fafc; border-bottom: 1px solid #e2e8f0;

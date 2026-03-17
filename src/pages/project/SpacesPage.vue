@@ -364,4 +364,14 @@ function createProject() {
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes scaleIn { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: scale(1); } }
+@media (max-width: 640px) {
+  .spaces-header { flex-wrap: wrap; gap: 10px; padding: 14px 16px 10px; }
+  .spaces-controls { flex-wrap: wrap; padding: 10px 16px; }
+  .search-input { width: 100%; }
+  .table-wrap { padding: 12px 16px; overflow-x: auto; }
+  .spaces-table { min-width: 560px; }
+  .grid-view { padding: 12px 16px; }
+  .pagination-row { padding: 10px 16px; flex-wrap: wrap; gap: 8px; }
+  .form-row { grid-template-columns: 1fr; }
+}
 </style>

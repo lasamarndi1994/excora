@@ -348,6 +348,10 @@ const filteredGroups = computed(() => {
   gap: 0;
 }
 
+@media (max-width: 768px) {
+  .inbox-sidebar { display: none; }
+}
+
 .sidebar-header {
   display: flex;
   align-items: center;

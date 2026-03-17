@@ -51,13 +51,15 @@
 /* Stat cards */
 .stat-row {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 14px;
   margin-bottom: 20px;
 }
+@media (min-width: 768px) { .stat-row { grid-template-columns: repeat(4, 1fr); } }
 .stat-row.cols-3 {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
+@media (min-width: 768px) { .stat-row.cols-3 { grid-template-columns: repeat(3, 1fr); } }
 
 .stat-card {
   position: relative;

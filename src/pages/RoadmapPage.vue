@@ -190,12 +190,12 @@ const summaryCards = [
 
 /* Header */
 .roadmap-header {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
   padding: 16px 24px 12px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;
 }
 .roadmap-title { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0 0 3px; }
 .roadmap-sub { font-size: 12px; color: #94a3b8; margin: 0; }
-.header-right { display: flex; align-items: center; gap: 8px; }
+.header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .view-toggle { display: flex; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; }
 .vt-btn { padding: 6px 12px; border: none; background: #fff; font-size: 12px; font-weight: 500; color: #64748b; cursor: pointer; font-family: 'Inter', sans-serif; transition: background .12s, color .12s; }
 .vt-btn.active { background: #eef2ff; color: #4f46e5; font-weight: 600; }
@@ -210,7 +210,7 @@ const summaryCards = [
 
 /* Controls */
 .roadmap-controls {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
   padding: 10px 24px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;
 }
 .legend { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
@@ -293,10 +293,16 @@ const summaryCards = [
 .tl-add-btn:hover { border-color: #a5b4fc; color: #4f46e5; }
 
 /* Summary cards */
-.summary-row { display: flex; gap: 0; border-top: 1px solid #e2e8f0; background: #fff; flex-shrink: 0; }
-.summary-card { flex: 1; display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-right: 1px solid #e2e8f0; }
+.summary-row { display: flex; gap: 0; border-top: 1px solid #e2e8f0; background: #fff; flex-shrink: 0; overflow-x: auto; }
+.summary-card { flex: 1; min-width: 100px; display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-right: 1px solid #e2e8f0; }
 .summary-card:last-child { border-right: none; }
 .sum-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .sum-val { font-size: 20px; font-weight: 700; color: #0f172a; line-height: 1; }
 .sum-label { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+@media (max-width: 768px) {
+  .tl-sidebar-cell { width: 160px; min-width: 160px; }
+  .roadmap-header { padding: 12px 16px 10px; }
+  .roadmap-controls { padding: 8px 16px; }
+}
 </style>

@@ -340,16 +340,22 @@ const debtItems = [
 /* ── CTO grid layout ── */
 .cto-grid {
   display: grid;
-  grid-template-columns: 1fr 300px;
-  grid-template-rows: auto auto;
+  grid-template-columns: 1fr;
   gap: 14px;
 }
-.cto-health   { grid-column: 1; grid-row: 1; }
-.cto-velocity { grid-column: 2; grid-row: 1; }
-.cto-metrics  { grid-column: 1 / -1; grid-row: 2; }
+@media (min-width: 900px) {
+  .cto-grid {
+    grid-template-columns: 1fr 300px;
+    grid-template-rows: auto auto;
+  }
+  .cto-health   { grid-column: 1; grid-row: 1; }
+  .cto-velocity { grid-column: 2; grid-row: 1; }
+  .cto-metrics  { grid-column: 1 / -1; grid-row: 2; }
+}
 
 /* ── Health cards ── */
-.health-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; padding: 14px; }
+.health-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; padding: 14px; }
+@media (min-width: 768px) { .health-grid { grid-template-columns: repeat(4,1fr); } }
 .health-card { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px; }
 .health-label { font-size:11px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; }
 .health-val   { font-size:26px; font-weight:700; line-height:1; margin-bottom:4px; }
@@ -410,7 +416,8 @@ const debtItems = [
 .cto-tab-body { padding:16px; animation:fadeSlideUp .3s ease both; }
 
 /* Infrastructure */
-.infra-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:14px; }
+.infra-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:14px; }
+@media (min-width: 768px) { .infra-grid { grid-template-columns:repeat(5,1fr); } }
 .infra-card { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:13px; transition:box-shadow .2s, transform .2s; }
 .infra-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.07); transform:translateY(-2px); }
 .infra-icon-wrap { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; margin-bottom:9px; }
@@ -446,7 +453,8 @@ const debtItems = [
 .sec-sum-label { font-size:11px; color:#64748b; font-weight:600; }
 
 /* Tech Debt */
-.debt-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+.debt-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+@media (min-width: 768px) { .debt-grid { grid-template-columns:repeat(5,1fr); } }
 .debt-card { background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:13px; transition:box-shadow .2s, transform .2s; }
 .debt-card:hover { box-shadow:0 4px 16px rgba(0,0,0,.07); transform:translateY(-2px); }
 .debt-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:9px; }

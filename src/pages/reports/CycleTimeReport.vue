@@ -129,4 +129,9 @@ const typeStats = [
 .data-table tbody tr:last-child td { border-bottom: none; }
 .data-table tbody tr:hover { background: #f8fafc; }
 .type-badge { padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+@media (max-width: 640px) {
+  .two-col { grid-template-columns: 1fr; }
+  .chart-card-header { flex-wrap: wrap; gap: 8px; }
+  .stat-chips { flex-wrap: wrap; }
+}
 </style>

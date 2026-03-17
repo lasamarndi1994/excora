@@ -789,6 +789,16 @@ const trustedStats = [
   .features-grid { grid-template-columns: 1fr; }
   .focus-inner { flex-direction: column; }
   .footer-inner { grid-template-columns: 1fr 1fr; }
+  .trusted-stats { flex-wrap: wrap; }
+  .trusted-stat { min-width: 120px; }
+}
+@media (max-width: 480px) {
+  .footer-inner { grid-template-columns: 1fr; }
+  .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+  .hero-cta-row { flex-direction: column; align-items: flex-start; }
+  .hero-title { font-size: 22px; }
+  .cta-card { padding: 36px 20px; }
+  .cta-title { font-size: 18px; }
 }
 
 .gap-2 { gap: 8px; }

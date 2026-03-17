@@ -396,5 +396,10 @@ const epics = [
   .stat-grid { grid-template-columns: 1fr 1fr; }
   .main-grid { grid-template-columns: 1fr; }
   .span-2 { grid-column: span 1; }
+  .status-body { flex-direction: column; align-items: flex-start; gap: 20px; }
+}
+@media (max-width: 600px) {
+  .stat-grid { grid-template-columns: 1fr; }
+  .overview-body { padding: 14px 14px 24px; }
 }
 </style>

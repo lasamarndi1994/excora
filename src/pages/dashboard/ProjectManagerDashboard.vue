@@ -400,9 +400,11 @@ const resources = [
 /* Projects grid */
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 14px;
 }
+@media (min-width: 640px) { .projects-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .projects-grid { grid-template-columns: repeat(3, 1fr); } }
 .project-card-inner { padding: 18px; }
 .lead-avatar {
   width: 32px; height: 32px;

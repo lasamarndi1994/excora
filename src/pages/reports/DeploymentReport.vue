@@ -144,4 +144,10 @@ const recentDeploys = [
 .env-dev        { background: #dbeafe; color: #1d4ed8; }
 .badge-green { background: #dcfce7; color: #15803d; }
 .badge-red   { background: #fee2e2; color: #dc2626; }
+@media (max-width: 640px) {
+  .dora-grid { grid-template-columns: repeat(2, 1fr); }
+  .chart-card-header { flex-wrap: wrap; gap: 8px; }
+  .table-card { overflow-x: auto; }
+  .data-table { min-width: 520px; }
+}
 </style>

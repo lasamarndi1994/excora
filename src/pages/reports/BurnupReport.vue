@@ -105,4 +105,8 @@ const stats = [
 .stat-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; text-align: center; }
 .stat-value { font-size: 22px; font-weight: 800; }
 .stat-label { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .chart-card-header { flex-wrap: wrap; gap: 8px; }
+}
 </style>

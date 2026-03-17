@@ -52,7 +52,7 @@
         <!-- Help -->
         <v-menu width="300" :close-on-content-click="false" offset="8" location="bottom end">
           <template #activator="{ props }">
-            <button class="icon-btn" v-bind="props">
+            <button class="icon-btn hide-xs" v-bind="props">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
           </template>
@@ -70,7 +70,7 @@
         <!-- Settings -->
         <v-menu width="340" :close-on-content-click="false" offset="8" location="bottom end">
           <template #activator="{ props }">
-            <button class="icon-btn" v-bind="props">
+            <button class="icon-btn hide-xs" v-bind="props">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="currentColor" stroke-width="1.8"/></svg>
             </button>
           </template>
@@ -229,20 +229,24 @@ const logout = () => {
 .search-container {
   position: relative;
   width: 200px; flex-shrink: 0;
+  display: none;
 }
+@media (min-width: 640px) { .search-container { display: block; } }
 .search-wrap {
   display: flex; align-items: center; gap: 8px;
   padding: 7px 12px; border-radius: 9px;
   border: 1.5px solid #e2e8f0; background: #f8fafc;
-  width: 300px;
+  width: 180px;
   position: absolute; right: 0; top: 50%; transform: translateY(-50%);
   transition: width .25s cubic-bezier(.4,0,.2,1), border-color .15s, background .15s;
 }
+@media (min-width: 768px) { .search-wrap { width: 300px; } }
 .search-wrap.focused {
-  width: 620px;
+  width: 280px;
   border-color: #4f46e5; background: #fff;
   box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
 }
+@media (min-width: 768px) { .search-wrap.focused { width: 620px; } }
 .search-icon { color: #94a3b8; flex-shrink: 0; }
 .search-input {
   flex: 1; min-width: 0; border: none; background: transparent; outline: none;
@@ -297,6 +301,12 @@ const logout = () => {
 }
 .user-name { font-size: 12.5px; font-weight: 600; color: #0f172a; line-height: 1.2; }
 .user-role { font-size: 10.5px; color: #94a3b8; }
+/* Hide user name/role text on small screens */
+.user-info { display: none; }
+@media (min-width: 640px) { .user-info { display: block; } }
+/* Hide help/settings on very small screens */
+.hide-xs { display: none; }
+@media (min-width: 480px) { .hide-xs { display: flex; } }
 
 /* Styled card */
 .styled-card {

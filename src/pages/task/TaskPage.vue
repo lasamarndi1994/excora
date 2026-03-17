@@ -498,8 +498,12 @@ const completionAreaPath = completionLinePath +
   background: #fff;
   border-bottom: 1px solid #e2e8f0;
   flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-.task-tabs { display: flex; gap: 0; }
+.task-tabs-bar::-webkit-scrollbar { display: none; }
+.task-tabs { display: flex; gap: 0; flex-shrink: 0; }
 .task-tab {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 11px 14px;
@@ -509,6 +513,7 @@ const completionAreaPath = completionLinePath +
   border-bottom: 2px solid transparent;
   transition: color .12s, border-color .12s;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 .task-tab:hover { color: #0f172a; }
 .task-tab.active { color: #4f46e5; border-bottom-color: #4f46e5; font-weight: 600; }
@@ -714,6 +719,18 @@ const completionAreaPath = completionLinePath +
 /* ── DASHBOARD VIEW ── */
 .dash-view { flex: 1; overflow-y: auto; padding: 16px 24px; display: flex; flex-direction: column; gap: 16px; }
 .dash-stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 900px) {
+  .dash-stat-row { grid-template-columns: repeat(2, 1fr); }
+  .dash-charts-row { flex-direction: column; }
+}
+@media (max-width: 600px) {
+  .dash-stat-row { grid-template-columns: 1fr 1fr; }
+  .task-header { flex-wrap: wrap; gap: 10px; padding: 12px 16px 10px; }
+  .task-tabs-bar { padding: 0 16px; }
+  .list-view { padding: 12px 16px; }
+  .board-view { padding: 12px 16px; }
+  .dash-view { padding: 12px 16px; }
+}
 .dash-stat-card {
   background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
   padding: 16px; display: flex; flex-direction: column; gap: 6px;

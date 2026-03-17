@@ -98,7 +98,7 @@ const members = computed(() => store.users.map((u,idx) => ({ name: u.name, avata
 .chart-svg { display: block; }
 .table-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
 .table-title { font-size: 14px; font-weight: 700; color: #0f172a; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; }
-.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 500px; }
 .data-table th { padding: 10px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #64748b; background: #f8fafc; border-bottom: 1px solid #e2e8f0; }
 .data-table td { padding: 10px 16px; border-bottom: 1px solid #f1f5f9; color: #374151; }
 .data-table tbody tr:last-child td { border-bottom: none; }
@@ -107,4 +107,9 @@ const members = computed(() => store.users.map((u,idx) => ({ name: u.name, avata
 .member-avatar { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
 .progress-track { height: 6px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
 .progress-fill  { height: 100%; border-radius: 4px; }
+@media (max-width: 640px) {
+  .table-card { overflow-x: auto; }
+  .chart-card-header { flex-wrap: wrap; gap: 8px; }
+  .report-controls { flex-direction: column; align-items: flex-start; }
+}
 </style>

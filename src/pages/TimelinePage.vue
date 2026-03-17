@@ -215,6 +215,13 @@ onMounted(() => {
   width: 300px; min-width: 300px; background: #fff;
   border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow: hidden;
 }
+
+@media (max-width: 768px) {
+  .tl-sidebar { display: none; }
+  .tl-toolbar { flex-wrap: wrap; }
+  .tl-toolbar-left, .tl-toolbar-right { flex-wrap: wrap; }
+  .search-input { width: 140px; }
+}
 .sidebar-head {
   padding: 12px 16px; font-size: 12px; font-weight: 700; color: #64748b;
   border-bottom: 1px solid #e2e8f0; height: 80px; display: flex; align-items: flex-end;

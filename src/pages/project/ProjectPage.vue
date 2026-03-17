@@ -334,4 +334,11 @@ const viewedItems = [
 .empty-simple { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px 20px; color: #94a3b8; font-size: 13px; }
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 640px) {
+  .proj-header { flex-wrap: wrap; gap: 10px; padding: 14px 16px 10px; }
+  .proj-body { padding: 14px 16px; }
+  .proj-header-right { width: 100%; justify-content: flex-end; }
+  .activity-tabs { overflow-x: auto; }
+  .act-tab { white-space: nowrap; }
+}
 </style>

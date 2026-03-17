@@ -278,10 +278,10 @@ const createBacklogIssue = () => {
 
 /* Toolbar */
 .bl-toolbar {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
   padding: 10px 24px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; gap: 12px;
 }
-.bl-toolbar-left, .bl-toolbar-right { display: flex; align-items: center; gap: 8px; }
+.bl-toolbar-left, .bl-toolbar-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .search-wrap { position: relative; }
 .search-input {
   padding: 6px 10px 6px 30px; border: 1px solid #e2e8f0; border-radius: 8px;
@@ -321,7 +321,7 @@ const createBacklogIssue = () => {
 .section-title { font-size: 14px; font-weight: 700; color: #0f172a; }
 .section-dates { font-size: 12px; color: #94a3b8; }
 .section-count { font-size: 12px; color: #94a3b8; }
-.section-header-right { display: flex; align-items: center; gap: 8px; }
+.section-header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .status-pills { display: flex; gap: 4px; }
 .pill { padding: 1px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; }
 .pill-grey  { background: #f1f5f9; color: #64748b; }

@@ -297,8 +297,8 @@ const confirmDeleteSprint = (id: string) => { store.deleteSprint(id); isDeleteDi
 
 /* Table */
 .sp-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
-.sp-table-wrap { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
-.sp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.sp-table-wrap { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: auto; }
+.sp-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 600px; }
 .sp-table thead tr { background: #f8fafc; }
 .sp-table th {
   padding: 11px 14px; text-align: left; font-size: 12px; font-weight: 600;
@@ -365,6 +365,17 @@ const confirmDeleteSprint = (id: string) => { store.deleteSprint(id); isDeleteDi
 
 /* KPI */
 .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+@media (max-width: 640px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .sp-toolbar { padding: 10px 16px; }
+  .sp-toolbar-left { flex-wrap: wrap; gap: 8px; }
+  .filter-tabs { flex-wrap: wrap; }
+  .sp-body { padding: 14px 16px; }
+  .sp-detail-body { padding: 14px 16px; }
+}
+@media (min-width: 641px) and (max-width: 900px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
 .kpi-card {
   background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
   padding: 18px; display: flex; flex-direction: column; gap: 6px; position: relative;

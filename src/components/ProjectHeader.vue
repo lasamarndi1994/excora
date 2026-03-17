@@ -100,7 +100,11 @@ const tabs = [
   display: flex;
   align-items: center;
   padding: 0 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+.ph-tabs::-webkit-scrollbar { display: none; }
 .ph-tab {
   display: flex; align-items: center;
   padding: 7px 11px;
@@ -109,6 +113,7 @@ const tabs = [
   text-decoration: none;
   border-bottom: 2px solid transparent;
   white-space: nowrap;
+  flex-shrink: 0;
   transition: color .12s, border-color .12s;
   background: none; border-top: none; border-left: none; border-right: none;
   cursor: pointer; font-family: 'Inter', sans-serif;
@@ -116,4 +121,8 @@ const tabs = [
 .ph-tab:hover { color: #1e293b; }
 .ph-tab--active { color: #4f46e5; border-bottom-color: #4f46e5; font-weight: 600; }
 .ph-tab-add { color: #94a3b8; padding: 7px 8px; }
+@media (max-width: 640px) {
+  .ph-name { font-size: 12px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ph-title-right { display: none; }
+}
 </style>
