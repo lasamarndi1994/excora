@@ -110,7 +110,7 @@
 
   <!-- Task Detail Panel (right side) -->
   <transition name="panel-slide">
-    <div v-if="selected" class="panel-overlay" @click.self="selected = null">
+    <div v-if="selected" class="panel-overlay">
       <div class="panel" @click.stop>
 
         <!-- Panel toolbar -->
@@ -154,7 +154,7 @@
         </div>
 
         <!-- Panel body -->
-        <div class="panel-body" @click="collabPickerOpen = false; taskMenuOpen = false">
+        <div class="panel-body" @click="collabPickerOpen = false; taskMenuOpen = false; assigneePickerOpen = false">
 
           <!-- Task name -->
           <div class="task-name-wrap">
@@ -173,15 +173,17 @@
                 Assignee
               </span>
               <div class="meta-val">
-                <div v-if="selected.assignee" class="assignee-chip" @click="selected.assignee = undefined">
-                  <div class="chip-av" :style="{ background: selected.assignee.bg }">{{ selected.assignee.initials }}</div>
-                  {{ selected.assignee.name }}
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="opacity:.5"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                <div style="position:relative">
+                  <div v-if="selected.assignee" class="assignee-chip" ref="assigneeTriggerRef" @click.stop="toggleAssigneePicker">
+                    <div class="chip-av" :style="{ background: selected.assignee.bg }">{{ selected.assignee.initials }}</div>
+                    {{ selected.assignee.name }}
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" style="opacity:.5; margin-left:2px"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+                  <button v-else class="meta-btn" ref="assigneeTriggerRef" @click.stop="toggleAssigneePicker">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><line x1="19" y1="8" x2="19" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="22" y1="11" x2="16" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    Assign to me
+                  </button>
                 </div>
-                <button v-else class="meta-btn" @click="assignSelf">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><line x1="19" y1="8" x2="19" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="22" y1="11" x2="16" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                  Assign to me
-                </button>
               </div>
             </div>
             <div class="meta-row">
@@ -234,9 +236,9 @@
               <button class="section-action" @click="addSubtask">+ Add subtask</button>
             </div>
             <div v-for="st in selected.subtasks" :key="st.id" class="subtask-row">
-              <button class="check-btn" :class="{ done: st.done }" @click="st.done = !st.done">
-                <svg v-if="st.done" width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#10b981"/><path d="M8 12l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#cbd5e1" stroke-width="2"/></svg>
+              <button class="check-btn check-btn--md" :class="{ done: st.done }" @click="st.done = !st.done">
+                <svg v-if="st.done" width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" fill="#10b981"/><path d="M8 12l3 3 5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg v-else width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#cbd5e1" stroke-width="2"/></svg>
               </button>
               <input class="subtask-input" :class="{ 'is-done': st.done }" v-model="st.name" />
               <button class="icon-btn-sm" @click="removeSubtask(st.id)">
@@ -329,6 +331,32 @@
     </div>
   </transition>
 
+  <!-- Assignee picker (teleported to body to escape overflow) -->
+  <teleport to="body">
+    <div v-if="assigneePickerOpen && selected" class="assignee-picker-fixed" :style="assigneePickerStyle" @click.stop>
+      <div class="assignee-picker-title">Assign to</div>
+      <div class="assignee-search-wrap">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="#94a3b8" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/></svg>
+        <input class="assignee-search-input" v-model="assigneeSearch" placeholder="Search name…" @click.stop />
+      </div>
+      <div v-for="u in filteredAssignees" :key="u.name"
+        class="assignee-picker-item" :class="{ 'is-selected': selected.assignee?.name === u.name }"
+        @click="selected.assignee = { ...u }; assigneePickerOpen = false">
+        <div class="assignee-picker-av" :style="{ background: u.bg }">{{ u.initials }}</div>
+        <span class="assignee-picker-name">{{ u.name }}</span>
+        <svg v-if="selected.assignee?.name === u.name" width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 6 9 17l-5-5" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div v-if="filteredAssignees.length === 0" class="assignee-no-results">No users found</div>
+      <div class="assignee-picker-divider"></div>
+      <div class="assignee-picker-item" @click="selected.assignee = undefined; assigneePickerOpen = false">
+        <div class="assignee-picker-av" style="background:#f1f5f9">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </div>
+        <span class="assignee-picker-name" style="color:#94a3b8">Unassign</span>
+      </div>
+    </div>
+  </teleport>
+
 </template>
 
 <script setup lang="ts">
@@ -359,6 +387,10 @@ const addingIn       = ref<string | null>(null)
 const newTaskName    = ref('')
 const newComment     = ref('')
 const collabPickerOpen = ref(false)
+const assigneePickerOpen = ref(false)
+const assigneeSearch = ref('')
+const assigneeTriggerRef = ref<HTMLElement | null>(null)
+const assigneePickerStyle = ref({})
 const addInputRef    = ref<HTMLInputElement | null>(null)
 
 // ── Drag & Drop state ──
@@ -486,7 +518,7 @@ const columns = reactive<Col[]>([
   { id: 'next-week', title: 'Do next week', color: '#10b981', tasks: [] },
 ])
 
-function closeAll() { colMenuOpen.value = null; taskMenuOpen.value = false; collabPickerOpen.value = false }
+function closeAll() { colMenuOpen.value = null; taskMenuOpen.value = false; collabPickerOpen.value = false; assigneePickerOpen.value = false }
 function openTask(task: Task) { selected.value = task; taskMenuOpen.value = false; collabPickerOpen.value = false }
 function toggleDone(task: Task) { task.done = !task.done }
 function toggleColMenu(id: string) { colMenuOpen.value = colMenuOpen.value === id ? null : id }
@@ -514,6 +546,19 @@ function removeColumn(colId: string) {
 }
 function addSection() { columns.push({ id: `s-${Date.now()}`, title: 'Untitled section', color: '#94a3b8', tasks: [] }) }
 function assignSelf() { if (selected.value) selected.value.assignee = { name: 'Me', initials: 'Me', bg: '#4f46e5' } }
+function toggleAssigneePicker() {
+  assigneePickerOpen.value = !assigneePickerOpen.value
+  if (assigneePickerOpen.value && assigneeTriggerRef.value) {
+    assigneeSearch.value = ''
+    const rect = assigneeTriggerRef.value.getBoundingClientRect()
+    assigneePickerStyle.value = {
+      position: 'fixed',
+      top: rect.bottom + 6 + 'px',
+      left: rect.left + 'px',
+      zIndex: 9999,
+    }
+  }
+}
 function addSubtask() { if (selected.value) selected.value.subtasks.push({ id: Date.now(), name: 'New subtask', done: false }) }
 function removeSubtask(id: number) { if (selected.value) selected.value.subtasks = selected.value.subtasks.filter(s => s.id !== id) }
 function removeAttachment(name: string) { if (selected.value) selected.value.attachments = selected.value.attachments.filter(a => a.name !== name) }
@@ -531,6 +576,11 @@ const availableCollaborators: Assignee[] = [
   { name: 'Raj R.',   initials: 'RR', bg: '#fde68a' }, { name: 'Uma P.',  initials: 'UP', bg: '#ede9fe' },
   { name: 'Lasa M.',  initials: 'LM', bg: '#cffafe' }, { name: 'Dev K.',  initials: 'DK', bg: '#d1fae5' },
 ]
+const filteredAssignees = computed(() =>
+  assigneeSearch.value.trim()
+    ? availableCollaborators.filter(u => u.name.toLowerCase().includes(assigneeSearch.value.toLowerCase()))
+    : availableCollaborators
+)
 function toggleCollaborator(user: Assignee) {
   if (!selected.value) return
   const idx = selected.value.collaborators.findIndex(c => c.name === user.name)
@@ -590,14 +640,15 @@ function autoResize(e: Event) { const el = e.target as HTMLTextAreaElement; el.s
 .bc-top { display: flex; align-items: flex-start; gap: 7px; margin-bottom: 6px; }
 .check-btn { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; border: none; background: none; cursor: pointer; flex-shrink: 0; transition: opacity .15s; margin-top: 1px; }
 .check-btn:hover { opacity: .75; }
+.check-btn--md { width: 26px; height: 26px; }
 .bc-name { font-size: 12.5px; font-weight: 500; color: #0f172a; line-height: 1.45; }
 .is-done { text-decoration: line-through; color: #94a3b8; }
 .bc-tag { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; margin-bottom: 6px; }
 .bc-foot { display: flex; align-items: center; justify-content: space-between; }
-.bc-date { font-size: 10.5px; color: #94a3b8; display: flex; align-items: center; gap: 3px; }
+.bc-date { font-size: 10.5px; color: #64748b; display: flex; align-items: center; gap: 3px; }
 .bc-date.overdue { color: #ef4444; }
 .bc-meta { display: flex; align-items: center; gap: 6px; }
-.bc-mi { display: inline-flex; align-items: center; gap: 3px; font-size: 10.5px; color: #94a3b8; }
+.bc-mi { display: inline-flex; align-items: center; gap: 3px; font-size: 10.5px; color: #64748b; }
 .bc-av { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 700; color: #fff; }
 
 /* ── Inline add ── */
@@ -623,7 +674,7 @@ function autoResize(e: Event) { const el = e.target as HTMLTextAreaElement; el.s
 
 /* ── Panel overlay ── */
 .panel-overlay { position: fixed; inset: 0; background: rgba(15,23,42,.25); z-index: 1100; display: flex; justify-content: flex-end; }
-.panel { width: 480px; max-width: 95vw; background: #fff; height: 100%; box-shadow: -6px 0 32px rgba(0,0,0,.14); display: flex; flex-direction: column; overflow: hidden; }
+.panel { width: 560px; max-width: 95vw; background: #fff; height: 100%; box-shadow: -6px 0 32px rgba(0,0,0,.14); display: flex; flex-direction: column; overflow: visible; }
 .panel-slide-enter-active, .panel-slide-leave-active { transition: transform .22s ease; }
 .panel-slide-enter-from, .panel-slide-leave-to { transform: translateX(100%); }
 
@@ -647,15 +698,15 @@ function autoResize(e: Event) { const el = e.target as HTMLTextAreaElement; el.s
 .meta-fields { display: flex; flex-direction: column; border: 1px solid #f1f5f9; border-radius: 10px; overflow: hidden; }
 .meta-row { display: flex; align-items: center; min-height: 38px; border-bottom: 1px solid #f8fafc; padding: 0 12px; }
 .meta-row:last-child { border-bottom: none; }
-.meta-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: #94a3b8; width: 110px; flex-shrink: 0; }
+.meta-label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #475569; width: 110px; flex-shrink: 0; }
 .meta-val { flex: 1; display: flex; align-items: center; }
-.meta-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 6px; border: none; background: none; font-size: 12px; color: #94a3b8; cursor: pointer; font-family: 'Inter', sans-serif; transition: background .12s, color .12s; }
+.meta-btn { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 6px; border: none; background: none; font-size: 12px; color: #475569; cursor: pointer; font-family: 'Inter', sans-serif; transition: background .12s, color .12s; }
 .meta-btn:hover { background: #f1f5f9; color: #475569; }
-.assignee-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 20px; background: #f1f5f9; font-size: 12px; font-weight: 500; color: #374151; cursor: pointer; transition: background .12s; }
+.assignee-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border-radius: 20px; background: #f1f5f9; font-size: 12px; font-weight: 500; color: #1e293b; cursor: pointer; transition: background .12s; }
 .assignee-chip:hover { background: #fef2f2; }
 .chip-av { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 7px; font-weight: 700; color: #fff; }
-.date-input { border: none; outline: none; background: none; font-size: 12px; color: #374151; font-family: 'Inter', sans-serif; cursor: pointer; }
-.proj-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #374151; }
+.date-input { border: none; outline: none; background: none; font-size: 12px; color: #1e293b; font-family: 'Inter', sans-serif; cursor: pointer; }
+.proj-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: #1e293b; }
 .proj-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .priority-btns { display: flex; gap: 5px; }
 .prio-btn { padding: 3px 10px; border-radius: 20px; border: 1.5px solid #e2e8f0; font-size: 11px; font-weight: 600; cursor: pointer; background: #f8fafc; color: #64748b; font-family: 'Inter', sans-serif; transition: all .12s; }
@@ -665,21 +716,22 @@ function autoResize(e: Event) { const el = e.target as HTMLTextAreaElement; el.s
 
 /* ── Sections ── */
 .section-block { display: flex; flex-direction: column; gap: 8px; }
-.section-title { font-size: 11.5px; font-weight: 700; color: #374151; text-transform: uppercase; letter-spacing: .04em; }
+.section-title { font-size: 11.5px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: .04em; }
 .section-title-row { display: flex; align-items: center; justify-content: space-between; }
-.count-badge { font-size: 11px; color: #94a3b8; font-weight: 400; text-transform: none; letter-spacing: 0; }
+.count-badge { font-size: 11px; color: #64748b; font-weight: 400; text-transform: none; letter-spacing: 0; }
 .section-action { font-size: 11.5px; color: #4f46e5; cursor: pointer; border: none; background: none; font-family: 'Inter', sans-serif; padding: 0; }
 .section-action:hover { text-decoration: underline; }
-.desc-input { width: 100%; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #374151; font-family: 'Inter', sans-serif; resize: vertical; outline: none; background: #f8fafc; transition: border-color .15s; box-sizing: border-box; }
+.desc-input { width: 100%; border: 1px solid #f1f5f9; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #1e293b; font-family: 'Inter', sans-serif; resize: vertical; outline: none; background: #f8fafc; transition: border-color .15s; box-sizing: border-box; }
+.desc-input::placeholder { color: #64748b; }
 .desc-input:focus { border-color: #a5b4fc; background: #fff; }
 
 /* ── Subtasks ── */
 .subtask-row { display: flex; align-items: center; gap: 6px; padding: 4px 0; border-bottom: 1px solid #f8fafc; }
-.subtask-input { flex: 1; border: none; outline: none; background: none; font-size: 12.5px; color: #374151; font-family: 'Inter', sans-serif; }
+.subtask-input { flex: 1; border: none; outline: none; background: none; font-size: 12.5px; color: #1e293b; font-family: 'Inter', sans-serif; }
 .subtask-input.is-done { text-decoration: line-through; color: #94a3b8; }
 .icon-btn-sm { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 5px; border: none; background: none; color: #cbd5e1; cursor: pointer; transition: color .12s, background .12s; }
 .icon-btn-sm:hover { color: #ef4444; background: #fef2f2; }
-.add-sub-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 7px; border: 1px dashed #e2e8f0; background: none; font-size: 12px; color: #94a3b8; cursor: pointer; font-family: 'Inter', sans-serif; transition: border-color .12s, color .12s; }
+.add-sub-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 7px; border: 1px dashed #e2e8f0; background: none; font-size: 12px; color: #64748b; cursor: pointer; font-family: 'Inter', sans-serif; transition: border-color .12s, color .12s; }
 .add-sub-btn:hover { border-color: #a5b4fc; color: #4f46e5; }
 
 /* ── Attachments ── */
@@ -692,35 +744,53 @@ function autoResize(e: Event) { const el = e.target as HTMLTextAreaElement; el.s
 .c-body { flex: 1; min-width: 0; }
 .c-header { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
 .c-author { font-size: 12px; font-weight: 600; color: #0f172a; }
-.c-time { font-size: 11px; color: #94a3b8; flex: 1; }
+.c-time { font-size: 11px; color: #64748b; flex: 1; }
 .c-del { opacity: 0; transition: opacity .12s; }
 .comment-row:hover .c-del { opacity: 1; }
-.c-text { font-size: 12.5px; color: #374151; line-height: 1.5; }
+.c-text { font-size: 12.5px; color: #1e293b; line-height: 1.5; }
 .new-comment { display: flex; gap: 10px; }
 .new-comment-wrap { flex: 1; }
-.new-comment-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: #374151; font-family: 'Inter', sans-serif; resize: none; outline: none; transition: border-color .15s; box-sizing: border-box; }
+.new-comment-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: #1e293b; font-family: 'Inter', sans-serif; resize: none; outline: none; transition: border-color .15s; box-sizing: border-box; }
 .new-comment-input:focus { border-color: #a5b4fc; }
 .new-comment-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 5px; }
-.comment-hint { font-size: 10.5px; color: #94a3b8; }
+.comment-hint { font-size: 10.5px; color: #64748b; }
 .btn-post { padding: 4px 14px; border-radius: 6px; border: none; background: #4f46e5; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; transition: background .12s; }
 .btn-post:hover:not(:disabled) { background: #4338ca; }
 .btn-post:disabled { opacity: .4; cursor: not-allowed; }
 
 /* ── Collaborators ── */
 .collab-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.collab-av { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #fff; border: 2px solid #fff; box-shadow: 0 0 0 1px #e2e8f0; cursor: pointer; position: relative; overflow: hidden; }
+.collab-av { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #1e293b; border: 2px solid #fff; box-shadow: 0 0 0 1px #e2e8f0; cursor: pointer; position: relative; overflow: hidden; }
 .collab-av .collab-x { display: none; position: absolute; inset: 0; background: rgba(239,68,68,.8); border-radius: 50%; align-items: center; justify-content: center; }
 .collab-av:hover .collab-x { display: flex; }
 .collab-av:hover .collab-initials { opacity: 0; }
 .collab-add { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1.5px dashed #c7d2fe; background: #f5f3ff; color: #4f46e5; cursor: pointer; transition: background .12s; }
 .collab-add:hover { background: #ede9fe; }
-.collab-picker { position: absolute; bottom: 36px; left: 0; z-index: 600; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12); min-width: 200px; padding: 4px; }
+.collab-picker { position: absolute; bottom: 36px; left: 0; z-index: 600; background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.12); min-width: 200px; padding: 4px; max-height: 260px; overflow-y: auto; }
 .collab-picker-title { font-size: 10.5px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .04em; padding: 6px 10px 4px; }
 .collab-picker-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 7px; cursor: pointer; transition: background .1s; }
 .collab-picker-item:hover { background: #f8fafc; }
 .collab-picker-item.is-added { background: #f0fdf4; }
-.collab-picker-av { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #fff; flex-shrink: 0; }
-.collab-picker-name { flex: 1; font-size: 12.5px; color: #374151; }
+.collab-picker-av { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #1e293b; flex-shrink: 0; }
+.collab-picker-name { flex: 1; font-size: 12.5px; color: #1e293b; }
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Assignee picker ── */
+.assignee-picker { display: none; }
+.assignee-picker-title { font-size: 10.5px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: .04em; padding: 6px 10px 4px; }
+.assignee-picker-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 7px; cursor: pointer; transition: background .1s; }
+.assignee-picker-item:hover { background: #f8fafc; }
+.assignee-picker-item.is-selected { background: #f0fdf4; }
+.assignee-picker-av { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #1e293b; flex-shrink: 0; }
+.assignee-picker-name { flex: 1; font-size: 12.5px; color: #1e293b; }
+.assignee-picker-divider { height: 1px; background: #f1f5f9; margin: 4px 0; }
+.assignee-chip { cursor: pointer; }
+
+/* Fixed teleported picker */
+.assignee-picker-fixed { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,.15); min-width: 210px; padding: 4px; max-height: 280px; overflow-y: auto; }
+.assignee-search-wrap { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-bottom: 1px solid #f1f5f9; margin-bottom: 4px; }
+.assignee-search-input { flex: 1; border: none; outline: none; font-size: 12.5px; color: #1e293b; font-family: 'Inter', sans-serif; background: none; }
+.assignee-search-input::placeholder { color: #94a3b8; }
+.assignee-no-results { font-size: 12px; color: #94a3b8; padding: 8px 10px; text-align: center; }
 </style>
