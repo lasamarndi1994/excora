@@ -1,25 +1,26 @@
 <template>
   <div class="cal-root">
-    <!-- Toolbar -->
-    <div class="cal-toolbar">
+    <div class="tab-toolbar">
       <div class="cal-nav">
-        <button class="nav-btn" @click="prevMonth"><v-icon size="16">mdi-chevron-left</v-icon></button>
+        <button class="icon-sq-btn" @click="prevMonth">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
         <span class="cal-month-label">{{ monthLabel }}</span>
-        <button class="nav-btn" @click="nextMonth"><v-icon size="16">mdi-chevron-right</v-icon></button>
+        <button class="icon-sq-btn" @click="nextMonth">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
-      <button class="today-btn" @click="goToday">Today</button>
+      <button class="toolbar-btn" @click="goToday">Today</button>
     </div>
 
-    <!-- Day headers -->
     <div class="cal-day-headers">
       <div v-for="d in dayNames" :key="d" class="day-hdr">{{ d }}</div>
     </div>
 
-    <!-- Grid -->
     <div class="cal-grid">
       <div v-for="(cell, i) in calCells" :key="i"
         class="cal-cell"
-        :class="{ 'other-month': !cell.current, 'is-today': cell.isToday, 'has-tasks': cell.tasks.length > 0 }">
+        :class="{ 'other-month': !cell.current, 'is-today': cell.isToday }">
         <div class="cell-num">{{ cell.day }}</div>
         <div v-for="task in cell.tasks.slice(0, 2)" :key="task.id" class="cell-task" :class="`ct-${task.color}`">
           {{ task.name }}
@@ -98,70 +99,25 @@ function goToday() {
 </script>
 
 <style scoped>
-.cal-root {
-  display: flex; flex-direction: column; height: 100%;
-  font-family: 'Inter', sans-serif; background: #f8fafc; overflow: hidden;
-}
-.cal-toolbar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 24px; background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;
-}
-.cal-nav { display: flex; align-items: center; gap: 8px; }
-.nav-btn {
-  display: flex; align-items: center; justify-content: center;
-  width: 28px; height: 28px; border-radius: 7px;
-  border: 1px solid #e2e8f0; background: #fff; color: #475569;
-  cursor: pointer; transition: background .12s, color .12s;
-}
-.nav-btn:hover { background: #f1f5f9; color: #0f172a; }
-.cal-month-label { font-size: 14px; font-weight: 700; color: #0f172a; min-width: 160px; text-align: center; }
-.today-btn {
-  padding: 6px 14px; border-radius: 7px; border: 1px solid #e2e8f0;
-  background: #fff; font-size: 12.5px; font-weight: 500; color: #475569;
-  cursor: pointer; font-family: 'Inter', sans-serif; transition: background .12s, border-color .12s, color .12s;
-}
-.today-btn:hover { background: #eef2ff; border-color: #c7d2fe; color: #4f46e5; }
-
-.cal-day-headers {
-  display: grid; grid-template-columns: repeat(7, 1fr);
-  background: #fff; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;
-}
-.day-hdr {
-  padding: 8px 0; text-align: center;
-  font-size: 11px; font-weight: 700; color: #94a3b8;
-  text-transform: uppercase; letter-spacing: .04em;
-}
-
-.cal-grid {
-  flex: 1; display: grid; grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(6, 1fr); overflow: hidden;
-}
-.cal-cell {
-  border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;
-  padding: 6px 8px; display: flex; flex-direction: column; gap: 3px;
-  min-height: 0; overflow: hidden; background: #fff;
-  transition: background .1s;
-}
-.cal-cell:hover { background: #f8fafc; }
-.cal-cell:nth-child(7n) { border-right: none; }
-.other-month { background: #f8fafc; }
-.other-month .cell-num { color: #cbd5e1; }
-.is-today .cell-num {
-  background: #4f46e5; color: #fff;
-  width: 22px; height: 22px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 700;
-}
-.cell-num { font-size: 12px; font-weight: 500; color: #475569; margin-bottom: 2px; }
-.cell-task {
-  font-size: 10.5px; font-weight: 500; padding: 2px 6px; border-radius: 4px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.ct-indigo { background: #eef2ff; color: #4f46e5; }
-.ct-blue   { background: #eff6ff; color: #2563eb; }
-.ct-green  { background: #f0fdf4; color: #16a34a; }
-.ct-amber  { background: #fffbeb; color: #d97706; }
-.ct-purple { background: #faf5ff; color: #7c3aed; }
-.ct-red    { background: #fef2f2; color: #ef4444; }
-.cell-more { font-size: 10px; color: #94a3b8; font-weight: 500; }
+.cal-root { display:flex; flex-direction:column; height:100%; font-family:'Inter',sans-serif; background:#f8fafc; overflow:hidden; }
+.cal-nav { display:flex; align-items:center; gap:8px; }
+.cal-month-label { font-size:14px; font-weight:700; color:#0f172a; min-width:160px; text-align:center; }
+.cal-day-headers { display:grid; grid-template-columns:repeat(7,1fr); background:#fff; border-bottom:1px solid #e2e8f0; flex-shrink:0; }
+.day-hdr { padding:8px 0; text-align:center; font-size:11px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:.04em; }
+.cal-grid { flex:1; display:grid; grid-template-columns:repeat(7,1fr); grid-template-rows:repeat(6,1fr); overflow:hidden; }
+.cal-cell { border-right:1px solid #e2e8f0; border-bottom:1px solid #e2e8f0; padding:6px 8px; display:flex; flex-direction:column; gap:3px; min-height:0; overflow:hidden; background:#fff; transition:background .1s; }
+.cal-cell:hover { background:#f8fafc; }
+.cal-cell:nth-child(7n) { border-right:none; }
+.other-month { background:#f8fafc; }
+.other-month .cell-num { color:#cbd5e1; }
+.is-today .cell-num { background:#4f46e5; color:#fff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; }
+.cell-num { font-size:12px; font-weight:500; color:#475569; margin-bottom:2px; }
+.cell-task { font-size:10.5px; font-weight:500; padding:2px 6px; border-radius:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.ct-indigo { background:#eef2ff; color:#4f46e5; }
+.ct-blue   { background:#eff6ff; color:#2563eb; }
+.ct-green  { background:#f0fdf4; color:#16a34a; }
+.ct-amber  { background:#fffbeb; color:#d97706; }
+.ct-purple { background:#faf5ff; color:#7c3aed; }
+.ct-red    { background:#fef2f2; color:#ef4444; }
+.cell-more { font-size:10px; color:#94a3b8; font-weight:500; }
 </style>

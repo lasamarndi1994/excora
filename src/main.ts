@@ -18,6 +18,7 @@ import { createApp } from 'vue'
 
 // Styles
 import '@/styles/global.css'
+import '@/styles/task-panel.css'
 
 const app = createApp(App)
 

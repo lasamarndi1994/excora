@@ -5,7 +5,7 @@
     <div class="stat-row">
       <div v-for="(s, i) in stats" :key="s.label" class="stat-card" :style="{ animationDelay: i * 60 + 'ms' }">
         <div class="sc-icon" :style="{ background: s.iconBg }">
-          <v-icon size="18" :color="s.iconColor">{{ s.icon }}</v-icon>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" :style="{ color: s.iconColor }" v-html="s.iconSvg"></svg>
         </div>
         <div class="sc-val">{{ s.value }}</div>
         <div class="sc-label">{{ s.label }}</div>
@@ -19,7 +19,10 @@
       <div class="chart-card">
         <div class="cc-head">
           <span class="cc-title">Tasks by section</span>
-          <span class="cc-filter"><v-icon size="12">mdi-filter-outline</v-icon> 1 Filter</span>
+          <span class="cc-filter">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            1 Filter
+          </span>
         </div>
         <div class="bar-chart">
           <div v-for="bar in sectionBars" :key="bar.label" class="bar-item">
@@ -39,7 +42,10 @@
       <div class="chart-card">
         <div class="cc-head">
           <span class="cc-title">Completion status</span>
-          <span class="cc-filter"><v-icon size="12">mdi-filter-outline</v-icon> 2 Filters</span>
+          <span class="cc-filter">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            2 Filters
+          </span>
         </div>
         <div class="donut-wrap">
           <div class="donut-svg-wrap">
@@ -65,7 +71,10 @@
       <div class="chart-card">
         <div class="cc-head">
           <span class="cc-title">Tasks by project</span>
-          <span class="cc-filter"><v-icon size="12">mdi-filter-outline</v-icon> No Filters</span>
+          <span class="cc-filter">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            No Filters
+          </span>
         </div>
         <div class="bar-chart">
           <div v-for="bar in projectBars" :key="bar.label" class="bar-item">
@@ -86,7 +95,10 @@
     <div class="chart-card chart-card--wide">
       <div class="cc-head">
         <span class="cc-title">Task completion over time</span>
-        <span class="cc-filter"><v-icon size="12">mdi-filter-outline</v-icon> 1 Filter</span>
+        <span class="cc-filter">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          1 Filter
+        </span>
       </div>
       <svg class="line-svg" viewBox="0 0 600 100" preserveAspectRatio="none">
         <defs>
@@ -111,10 +123,14 @@
 import { computed } from 'vue'
 
 const stats = [
-  { label: 'Completed',  value: 7,  pct: 64,  icon: 'mdi-check-circle-outline', iconBg: '#f0fdf4', iconColor: '#10b981' },
-  { label: 'Incomplete', value: 4,  pct: 36,  icon: 'mdi-circle-half-full',     iconBg: '#eff6ff', iconColor: '#3b82f6' },
-  { label: 'Overdue',    value: 3,  pct: 27,  icon: 'mdi-clock-alert-outline',  iconBg: '#fef2f2', iconColor: '#ef4444' },
-  { label: 'Total',      value: 11, pct: 100, icon: 'mdi-format-list-checks',   iconBg: '#eef2ff', iconColor: '#6366f1' },
+  { label: 'Completed',  value: 7,  pct: 64,  iconColor: '#10b981', iconBg: '#f0fdf4',
+    iconSvg: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' },
+  { label: 'Incomplete', value: 4,  pct: 36,  iconColor: '#3b82f6', iconBg: '#eff6ff',
+    iconSvg: '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
+  { label: 'Overdue',    value: 3,  pct: 27,  iconColor: '#ef4444', iconBg: '#fef2f2',
+    iconSvg: '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><polyline points="12 6 12 12 16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>' },
+  { label: 'Total',      value: 11, pct: 100, iconColor: '#6366f1', iconBg: '#eef2ff',
+    iconSvg: '<line x1="8" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="6" x2="3.01" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="12" x2="3.01" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="18" x2="3.01" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>' },
 ]
 
 const sectionBars = [
@@ -157,62 +173,25 @@ const areaPath = computed(() => {
 </script>
 
 <style scoped>
-.tdash-root {
-  flex: 1; overflow-y: auto; padding: 16px 24px;
-  display: flex; flex-direction: column; gap: 16px;
-  font-family: 'Inter', sans-serif;
-}
-
-/* Stat row */
-.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.stat-card {
-  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0;
-  padding: 16px; display: flex; flex-direction: column; gap: 6px;
-  animation: fadeUp .25s ease both;
-  transition: box-shadow .15s, transform .15s;
-}
-.stat-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.07); transform: translateY(-2px); }
-.sc-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 4px; }
-.sc-val { font-size: 28px; font-weight: 700; color: #0f172a; line-height: 1; }
-.sc-label { font-size: 12px; color: #64748b; }
-.sc-bar { height: 4px; background: #f1f5f9; border-radius: 99px; overflow: hidden; margin-top: 4px; }
-.sc-bar-fill { height: 100%; border-radius: 99px; transition: width .6s; }
-
-/* Charts row */
-.charts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.chart-card {
-  background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; padding: 16px;
-}
-.chart-card--wide { grid-column: 1 / -1; }
-.cc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-.cc-title { font-size: 13px; font-weight: 600; color: #0f172a; }
-.cc-filter { display: flex; align-items: center; gap: 4px; font-size: 11px; color: #94a3b8; }
-
-/* Bar chart */
-.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
-.bar-item { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; height: 100%; }
-.bar-val { font-size: 11px; color: #64748b; font-weight: 600; min-height: 16px; }
-.bar-col-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
-.bar-fill { width: 100%; border-radius: 4px 4px 0 0; min-height: 3px; transition: height .5s; }
-.bar-lbl { font-size: 10px; color: #94a3b8; text-align: center; }
-
-/* Donut */
-.donut-wrap { display: flex; align-items: center; gap: 16px; }
-.donut-svg-wrap { position: relative; flex-shrink: 0; }
-.donut-center {
-  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font-size: 18px; font-weight: 700; color: #0f172a;
-}
-.donut-legend { display: flex; flex-direction: column; gap: 8px; }
-.dl-row { display: flex; align-items: center; gap: 7px; font-size: 12px; }
-.dl-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.dl-lbl { color: #64748b; flex: 1; }
-.dl-val { font-weight: 700; color: #0f172a; }
-
-/* Line chart */
-.line-svg { width: 100%; height: 100px; display: block; }
-.line-labels { display: flex; justify-content: space-between; margin-top: 6px; }
-.line-labels span { font-size: 9px; color: #94a3b8; flex: 1; text-align: center; }
-
-@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.tdash-root { flex:1; overflow-y:auto; padding:16px 24px; display:flex; flex-direction:column; gap:16px; font-family:'Inter',sans-serif; }
+.stat-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+.charts-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.chart-card--wide { grid-column:1/-1; }
+.bar-chart { display:flex; align-items:flex-end; gap:8px; height:120px; }
+.bar-item { display:flex; flex-direction:column; align-items:center; flex:1; gap:4px; height:100%; }
+.bar-val { font-size:11px; color:#64748b; font-weight:600; min-height:16px; }
+.bar-col-wrap { flex:1; width:100%; display:flex; align-items:flex-end; }
+.bar-fill { width:100%; border-radius:4px 4px 0 0; min-height:3px; transition:height .5s; }
+.bar-lbl { font-size:10px; color:#94a3b8; text-align:center; }
+.donut-wrap { display:flex; align-items:center; gap:16px; }
+.donut-svg-wrap { position:relative; flex-shrink:0; }
+.donut-center { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color:#0f172a; }
+.donut-legend { display:flex; flex-direction:column; gap:8px; }
+.dl-row { display:flex; align-items:center; gap:7px; font-size:12px; }
+.dl-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.dl-lbl { color:#64748b; flex:1; }
+.dl-val { font-weight:700; color:#0f172a; }
+.line-svg { width:100%; height:100px; display:block; }
+.line-labels { display:flex; justify-content:space-between; margin-top:6px; }
+.line-labels span { font-size:9px; color:#94a3b8; flex:1; text-align:center; }
 </style>
