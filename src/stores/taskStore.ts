@@ -21,6 +21,8 @@ export interface Epic {
   color: string
   startDate?: string
   dueDate?: string
+  status?: 'In Progress' | 'On Track' | 'Planned' | 'At Risk' | 'Done'
+  milestones?: { label: string; date: string }[]
 }
 
 export interface User {
@@ -68,28 +70,22 @@ export const useTaskStore = defineStore('task', () => {
 
   const epics = ref<Epic[]>([
     {
-      id: 'e1',
-      name: 'Mobile App Launch',
-      summary: 'Improve NPS for mobile app users',
-      color: '#6554C0',
-      startDate: '2025-11-01',
-      dueDate: '2025-11-15',
+      id: 'e1', name: 'Mobile App Launch', summary: 'Improve NPS for mobile app users',
+      color: '#6366f1', startDate: '2025-10-01', dueDate: '2025-12-15',
+      status: 'In Progress',
+      milestones: [{ label: 'Beta launch', date: '2025-10-20' }, { label: 'GA', date: '2025-12-01' }],
     },
     {
-      id: 'e2',
-      name: 'Growth',
-      summary: 'Increase mobile app users by 50%',
-      color: '#8777D9',
-      startDate: '2025-11-20',
-      dueDate: '2025-12-30',
+      id: 'e2', name: 'Growth', summary: 'Increase mobile app users by 50%',
+      color: '#a855f7', startDate: '2025-11-10', dueDate: '2026-02-28',
+      status: 'On Track',
+      milestones: [{ label: 'Design freeze', date: '2025-12-15' }],
     },
     {
-      id: 'e3',
-      name: 'Analytics',
-      summary: 'Improve in-app analytics',
-      color: '#8777D9',
-      startDate: '2025-11-01',
-      dueDate: '2025-12-01',
+      id: 'e3', name: 'Analytics', summary: 'Improve in-app analytics',
+      color: '#10b981', startDate: '2025-10-20', dueDate: '2026-03-10',
+      status: 'In Progress',
+      milestones: [{ label: 'v1 release', date: '2025-12-01' }, { label: 'v2', date: '2026-02-01' }],
     },
   ])
 
@@ -287,6 +283,25 @@ export const useTaskStore = defineStore('task', () => {
     sprints.value = sprints.value.filter(s => s.id !== sprintId)
   }
 
+  // --- Epic Actions ---
+  const addEpic = (epicData: Omit<Epic, 'id'>) => {
+    const newId = `e${epics.value.length + 1}`
+    epics.value.push({ ...epicData, id: newId })
+  }
+
+  const updateEpic = (epicId: string, updatedData: Partial<Epic>) => {
+    const index = epics.value.findIndex(e => e.id === epicId)
+    if (index !== -1) {
+      const current = epics.value[index]
+      if (current) epics.value[index] = { ...current, ...updatedData, id: current.id } as Epic
+    }
+  }
+
+  const deleteEpic = (epicId: string) => {
+    epics.value = epics.value.filter(e => e.id !== epicId)
+    issues.value.forEach(issue => { if (issue.epicLink === epicId) issue.epicLink = undefined })
+  }
+
   // --- Decision Actions ---
   const addDecision = (decisionData: Omit<Decision, 'id'>) => {
     // Generate an ID like DEC-00X
@@ -325,6 +340,9 @@ export const useTaskStore = defineStore('task', () => {
     addSprint,
     updateSprint,
     deleteSprint,
+    addEpic,
+    updateEpic,
+    deleteEpic,
     addDecision,
     updateDecision,
     deleteDecision,
