@@ -154,6 +154,18 @@
       </div>
 
       <div class="bar-right">
+        <!-- Board / List toggle -->
+        <div class="view-mode-toggle">
+          <button class="vmt-btn" :class="{ active: boardView === 'board' }" @click.stop="boardView = 'board'" title="Board view">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="5" height="18" rx="1" stroke="currentColor" stroke-width="2"/><rect x="10" y="3" width="5" height="12" rx="1" stroke="currentColor" stroke-width="2"/><rect x="17" y="3" width="5" height="15" rx="1" stroke="currentColor" stroke-width="2"/></svg>
+            Board
+          </button>
+          <button class="vmt-btn" :class="{ active: boardView === 'list' }" @click.stop="boardView = 'list'" title="List view">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><line x1="8" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="8" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="6" x2="3.01" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="12" x2="3.01" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="18" x2="3.01" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            List
+          </button>
+        </div>
+
         <!-- Complete Sprint -->
         <button class="bar-btn bar-btn--primary" @click.stop="showCompleteDialog = true">Complete Sprint</button>
 
@@ -243,7 +255,7 @@
     </div>
 
     <!-- Board body -->
-    <div class="board-body">
+    <div v-if="boardView === 'board'" class="board-body">
       <div class="board-scroll">
 
         <!-- GROUP BY: NONE — flat columns -->
@@ -444,6 +456,100 @@
       </div>
     </div>
 
+    <!-- List view -->
+    <div v-if="boardView === 'list'" class="list-view">
+      <table class="list-table">
+        <thead>
+          <tr>
+            <th style="width:40%">Summary</th>
+            <th style="width:10%">Type</th>
+            <th style="width:10%">Status</th>
+            <th style="width:10%">Priority</th>
+            <th style="width:15%">Assignee</th>
+            <th style="width:15%">Epic</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="(group, gi) in listGroups" :key="group.status">
+            <!-- Group header -->
+            <tr class="list-group-row" @click="toggleListGroup(group.status)">
+              <td colspan="6">
+                <div class="list-group-label">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                    :style="{ transform: collapsedListGroups.includes(group.status) ? 'rotate(-90deg)' : 'rotate(0)', transition: 'transform .2s' }">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span class="list-group-dot" :style="{ background: group.color }"></span>
+                  {{ group.label }}
+                  <span class="list-group-cnt">{{ group.issues.length }}</span>
+                </div>
+              </td>
+            </tr>
+            <!-- Issue rows -->
+            <template v-if="!collapsedListGroups.includes(group.status)">
+              <tr v-for="(issue, ii) in group.issues" :key="issue.id"
+                class="list-issue-row"
+                :style="{ animationDelay: ii * 25 + 'ms' }"
+                @click.stop="openIssueDetails(issue)">
+                <td>
+                  <div class="list-name-cell">
+                    <span class="list-type-icon" v-html="typeIcon(issue.type)"></span>
+                    <span class="list-key">{{ issue.key }}</span>
+                    <span class="list-summary">{{ issue.summary }}</span>
+                    <span v-if="showEpicLabels && issue.epicLink" class="list-epic-chip"
+                      :style="{ background: epicColor(issue.epicLink) + '22', color: epicColor(issue.epicLink) }">
+                      {{ epicName(issue.epicLink) }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <span class="list-type-badge" v-html="typeIcon(issue.type)"></span>
+                </td>
+                <td>
+                  <span class="list-status-chip" :class="`ls-${issue.status.toLowerCase().replace('_','-')}`">
+                    {{ issue.status.replace('_', ' ') }}
+                  </span>
+                </td>
+                <td>
+                  <span v-if="showPriorityBadge" class="list-prio-chip"
+                    :style="{ background: prioColor(issue.priority) + '22', color: prioColor(issue.priority) }">
+                    {{ issue.priority }}
+                  </span>
+                </td>
+                <td>
+                  <div class="list-assignees">
+                    <img v-for="(a, ai) in issue.assignees.slice(0,2)" :key="a.id"
+                      :src="a.avatar" :title="a.name" class="list-av"
+                      :style="{ marginLeft: ai > 0 ? '-5px' : '0' }" />
+                    <span v-if="!issue.assignees.length" class="list-unassigned">—</span>
+                  </div>
+                </td>
+                <td>
+                  <span v-if="issue.epicLink" class="list-epic-label"
+                    :style="{ color: epicColor(issue.epicLink) }">
+                    {{ epicName(issue.epicLink) }}
+                  </span>
+                  <span v-else class="list-unassigned">—</span>
+                </td>
+              </tr>
+              <!-- Add issue row -->
+              <tr class="list-add-row" @click.stop="openCreateIssue()">
+                <td colspan="6">
+                  <span class="list-add-inner">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                    Create issue
+                  </span>
+                </td>
+              </tr>
+            </template>
+          </template>
+          <tr v-if="filteredIssues.length === 0">
+            <td colspan="6" class="list-empty">No issues match the current filters.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
     <!-- Complete Sprint dialog -->
     <Teleport to="body">
       <div v-if="showCompleteDialog" class="modal-overlay" @click.self="showCompleteDialog = false">
@@ -486,6 +592,22 @@ import IssueDetailsDialog from '@/components/IssueDetailsDialog.vue'
 import CreateIssueDrawer from '@/components/CreateIssueDrawer.vue'
 
 const store = useTaskStore()
+
+// ── View mode ──
+const boardView = ref<'board' | 'list'>('board')
+
+// ── List view state ──
+const collapsedListGroups = ref<string[]>([])
+const toggleListGroup = (status: string) => {
+  const i = collapsedListGroups.value.indexOf(status)
+  i === -1 ? collapsedListGroups.value.push(status) : collapsedListGroups.value.splice(i, 1)
+}
+
+const listGroups = computed(() => [
+  { status: 'TODO',        label: 'To Do',       color: '#94a3b8', issues: filteredIssues.value.filter(i => i.status === 'TODO') },
+  { status: 'IN_PROGRESS', label: 'In Progress',  color: '#4f46e5', issues: filteredIssues.value.filter(i => i.status === 'IN_PROGRESS') },
+  { status: 'DONE',        label: 'Done',         color: '#10b981', issues: filteredIssues.value.filter(i => i.status === 'DONE') },
+])
 
 // ── Dialogs ──
 const isDetailsOpen = ref(false)
@@ -1968,5 +2090,180 @@ kbd {
   padding: 1px 5px;
   font-size: 11px;
   font-family: 'Inter', sans-serif;
+}
+
+/* ── View mode toggle ── */
+.view-mode-toggle {
+  display: flex;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  overflow: hidden;
+}
+.vmt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border: none;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background .12s, color .12s;
+  border-right: 1px solid #e2e8f0;
+}
+.vmt-btn:last-child { border-right: none; }
+.vmt-btn:hover { background: #f1f5f9; color: #0f172a; }
+.vmt-btn.active { background: #eef2ff; color: #4f46e5; font-weight: 600; }
+
+/* ── List view ── */
+.list-view {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+  background: #f8fafc;
+}
+.list-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+.list-table thead th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.list-group-row { cursor: pointer; }
+.list-group-row td { padding: 0; }
+.list-group-row:hover td { background: #f1f5f9; }
+.list-group-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  user-select: none;
+}
+.list-group-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.list-group-cnt {
+  background: #e2e8f0;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 20px;
+}
+.list-issue-row {
+  cursor: pointer;
+  animation: fadeUp .2s ease both;
+  transition: background .1s;
+}
+.list-issue-row:hover td { background: #f8fafc; }
+.list-issue-row td {
+  padding: 9px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+  font-size: 13px;
+}
+.list-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.list-type-icon { display: flex; align-items: center; flex-shrink: 0; }
+.list-type-badge { display: flex; align-items: center; }
+.list-key {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.list-summary {
+  font-size: 13px;
+  font-weight: 500;
+  color: #0f172a;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.list-epic-chip {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.list-status-chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.ls-todo        { background: #f1f5f9; color: #64748b; }
+.ls-in-progress { background: #eef2ff; color: #4f46e5; }
+.ls-done        { background: #f0fdf4; color: #16a34a; }
+.list-prio-chip {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.list-assignees { display: flex; align-items: center; }
+.list-av {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #fff;
+}
+.list-epic-label { font-size: 12px; font-weight: 500; }
+.list-unassigned { color: #cbd5e1; font-size: 12px; }
+.list-add-row { cursor: pointer; }
+.list-add-row:hover td { background: #f8fafc; }
+.list-add-row td { padding: 8px 14px; border-top: 1px dashed #e2e8f0; }
+.list-add-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  color: #94a3b8;
+  transition: color .12s;
+}
+.list-add-row:hover .list-add-inner { color: #4f46e5; }
+.list-empty {
+  text-align: center;
+  padding: 40px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 </style>
