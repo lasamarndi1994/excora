@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="files-root" @click="closeAllMenus">
 
     <!-- Toolbar -->
@@ -288,39 +288,39 @@ const filteredFiles = computed(() => {
   })
 })
 
-function setSortBy(v: string) {
+const setSortBy = (v: string) => {
   sortBy.value = v as SortKey
 }
 
-function openPreview(f: FileItem) {
+const openPreview = (f: FileItem) => {
   preview.value = f
   menuOpenId.value = null
 }
 
-function openMenu(id: number) {
+const openMenu = (id: number) => {
   menuOpenId.value = menuOpenId.value === id ? null : id
 }
 
-function closeAllMenus() {
+const closeAllMenus = () => {
   menuOpenId.value = null
   filterOpen.value = false
   sortOpen.value = false
 }
 
-function downloadFile(f: FileItem) {
+const downloadFile = (f: FileItem) => {
   console.log('Download:', f.name)
 }
 
-function deleteFile(id: number) {
+const deleteFile = (id: number) => {
   files.value = files.value.filter(f => f.id !== id)
   if (preview.value?.id === id) preview.value = null
 }
 
-function triggerUpload() {
+const triggerUpload = () => {
   fileInputRef.value?.click()
 }
 
-function onFileInputChange(e: Event) {
+const onFileInputChange = (e: Event) => {
   const input = e.target as HTMLInputElement
   if (!input.files) return
   Array.from(input.files).forEach((file, idx) => {
@@ -345,7 +345,7 @@ function onFileInputChange(e: Event) {
   input.value = ''
 }
 
-function onDrop(e: DragEvent) {
+const onDrop = (e: DragEvent) => {
   dragging.value = false
   if (!e.dataTransfer?.files.length) return
   const fakeEvent = { target: { files: e.dataTransfer.files, value: '' } } as unknown as Event

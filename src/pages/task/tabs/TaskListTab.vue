@@ -330,15 +330,15 @@ interface Task {
   subtasks: Subtask[]; comments: Comment[]; collaborators: Assignee[]; attachments: Attachment[]
 }
 
-const collapsed          = ref(false)
-const selected           = ref<Task | null>(null)
-const taskMenuOpen       = ref(false)
-const collabPickerOpen   = ref(false)
-const assigneePickerOpen = ref(false)
-const assigneeSearch     = ref('')
-const assigneeTriggerRef = ref<HTMLElement | null>(null)
+const collapsed           = ref(false)
+const selected            = ref<Task | null>(null)
+const taskMenuOpen        = ref(false)
+const collabPickerOpen    = ref(false)
+const assigneePickerOpen  = ref(false)
+const assigneeSearch      = ref('')
+const assigneeTriggerRef  = ref<HTMLElement | null>(null)
 const assigneePickerStyle = ref({})
-const newComment         = ref('')
+const newComment          = ref('')
 
 const tasks = reactive<Task[]>([
   { id:1, name:'Partner library task updates', done:false, date:'29 Jan', dueDate:'2025-01-29', priority:'High', assignee:{ name:'Arjun P.', initials:'AP', bg:'#fed7aa' }, project:'Execora', description:'', subtasks:[{ id:1, name:'Review changelog', done:false }], comments:[{ id:1, author:'Sara M.', avInitials:'SM', avBg:'#fef3c7', text:'LGTM! Ship it 🚀', time:'2 days ago' }], collaborators:[{ name:'Sara M.', initials:'SM', bg:'#fef3c7' }], attachments:[] },
@@ -349,15 +349,29 @@ const tasks = reactive<Task[]>([
 ])
 
 let nextId = 50
-function addTask() {
+let cid    = 500
+
+const addTask = () => {
   tasks.push({ id: nextId++, name: 'New task', done: false, subtasks: [], comments: [], collaborators: [], attachments: [] })
 }
 
-function openTask(task: Task) { selected.value = task; taskMenuOpen.value = false; collabPickerOpen.value = false }
-function toggleDone(task: Task) { task.done = !task.done }
-function closeAll() { taskMenuOpen.value = false; collabPickerOpen.value = false; assigneePickerOpen.value = false }
+const openTask = (task: Task) => {
+  selected.value = task
+  taskMenuOpen.value = false
+  collabPickerOpen.value = false
+}
 
-function toggleAssigneePicker() {
+const toggleDone = (task: Task) => {
+  task.done = !task.done
+}
+
+const closeAll = () => {
+  taskMenuOpen.value = false
+  collabPickerOpen.value = false
+  assigneePickerOpen.value = false
+}
+
+const toggleAssigneePicker = () => {
   assigneePickerOpen.value = !assigneePickerOpen.value
   if (assigneePickerOpen.value && assigneeTriggerRef.value) {
     assigneeSearch.value = ''
@@ -366,47 +380,72 @@ function toggleAssigneePicker() {
   }
 }
 
-function addSubtask() { if (selected.value) selected.value.subtasks.push({ id: Date.now(), name: 'New subtask', done: false }) }
-function removeSubtask(id: number) { if (selected.value) selected.value.subtasks = selected.value.subtasks.filter(s => s.id !== id) }
-function removeAttachment(name: string) { if (selected.value) selected.value.attachments = selected.value.attachments.filter(a => a.name !== name) }
+const addSubtask = () => {
+  if (selected.value) selected.value.subtasks.push({ id: Date.now(), name: 'New subtask', done: false })
+}
 
-let cid = 500
-function postComment() {
+const removeSubtask = (id: number) => {
+  if (selected.value) selected.value.subtasks = selected.value.subtasks.filter(s => s.id !== id)
+}
+
+const removeAttachment = (name: string) => {
+  if (selected.value) selected.value.attachments = selected.value.attachments.filter(a => a.name !== name)
+}
+
+const postComment = () => {
   if (!selected.value || !newComment.value.trim()) return
   selected.value.comments.push({ id: cid++, author: 'Me', avInitials: 'Me', avBg: '#4f46e5', text: newComment.value.trim(), time: 'Just now' })
   newComment.value = ''
 }
-function deleteComment(id: number) { if (selected.value) selected.value.comments = selected.value.comments.filter(c => c.id !== id) }
+
+const deleteComment = (id: number) => {
+  if (selected.value) selected.value.comments = selected.value.comments.filter(c => c.id !== id)
+}
 
 const availableCollaborators: Assignee[] = [
-  { name: 'Arjun P.', initials: 'AP', bg: '#fed7aa' }, { name: 'Sara M.', initials: 'SM', bg: '#fef3c7' },
-  { name: 'Raj R.',   initials: 'RR', bg: '#fde68a' }, { name: 'Uma P.',  initials: 'UP', bg: '#ede9fe' },
-  { name: 'Lasa M.',  initials: 'LM', bg: '#cffafe' }, { name: 'Dev K.',  initials: 'DK', bg: '#d1fae5' },
+  { name: 'Arjun P.', initials: 'AP', bg: '#fed7aa' },
+  { name: 'Sara M.',  initials: 'SM', bg: '#fef3c7' },
+  { name: 'Raj R.',   initials: 'RR', bg: '#fde68a' },
+  { name: 'Uma P.',   initials: 'UP', bg: '#ede9fe' },
+  { name: 'Lasa M.',  initials: 'LM', bg: '#cffafe' },
+  { name: 'Dev K.',   initials: 'DK', bg: '#d1fae5' },
 ]
+
 const filteredAssignees = computed(() =>
   assigneeSearch.value.trim()
     ? availableCollaborators.filter(u => u.name.toLowerCase().includes(assigneeSearch.value.toLowerCase()))
     : availableCollaborators
 )
-function toggleCollaborator(user: Assignee) {
+
+const toggleCollaborator = (user: Assignee) => {
   if (!selected.value) return
   const idx = selected.value.collaborators.findIndex(c => c.name === user.name)
   idx !== -1 ? selected.value.collaborators.splice(idx, 1) : selected.value.collaborators.push({ ...user })
 }
-function removeCollaborator(name: string) { if (selected.value) selected.value.collaborators = selected.value.collaborators.filter(c => c.name !== name) }
 
-function duplicateTask() {
+const removeCollaborator = (name: string) => {
+  if (selected.value) selected.value.collaborators = selected.value.collaborators.filter(c => c.name !== name)
+}
+
+const duplicateTask = () => {
   if (!selected.value) return
   const copy: Task = { ...JSON.parse(JSON.stringify(selected.value)), id: nextId++ }
-  copy.name += ' (copy)'; tasks.push(copy)
+  copy.name += ' (copy)'
+  tasks.push(copy)
 }
-function deleteTask() {
+
+const deleteTask = () => {
   if (!selected.value) return
   const idx = tasks.findIndex(t => t.id === selected.value!.id)
   if (idx !== -1) tasks.splice(idx, 1)
   selected.value = null
 }
-function autoResize(e: Event) { const el = e.target as HTMLTextAreaElement; el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px' }
+
+const autoResize = (e: Event) => {
+  const el = e.target as HTMLTextAreaElement
+  el.style.height = 'auto'
+  el.style.height = el.scrollHeight + 'px'
+}
 </script>
 <style scoped>
 .list-root { display:flex; flex-direction:column; height:100%; overflow:hidden; font-family:'Inter',sans-serif; }

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <teleport to="body">
     <transition name="drawer-fade">
       <div v-if="modelValue" class="drawer-overlay" @click.self="$emit('update:modelValue', false)">
@@ -371,7 +371,7 @@ const form = reactive(defaultForm())
 
 const selectedAssignee = computed(() => store.users.find(u => u.id === form.assigneeId) ?? null)
 
-function toggleMoreFields() {
+const toggleMoreFields = () => {
   showMoreFields.value = !showMoreFields.value
   if (showMoreFields.value) {
     // scroll to show the new fields after they render
@@ -383,18 +383,18 @@ function toggleMoreFields() {
   }
 }
 
-function toggleLabel(lbl: string) {
+const toggleLabel = (lbl: string) => {
   const i = form.labels.indexOf(lbl)
   i === -1 ? form.labels.push(lbl) : form.labels.splice(i, 1)
 }
 
-function addTag(e: KeyboardEvent) {
+const addTag = (e: KeyboardEvent) => {
   const val = (e.target as HTMLInputElement).value.trim().replace(/,$/, '')
   if (val && !form.tags.includes(val)) form.tags.push(val);
   (e.target as HTMLInputElement).value = ''
 }
 
-function handleCreate(addAnother: boolean) {
+const handleCreate = (addAnother: boolean) => {
   if (!form.summary.trim()) return
   store.createIssue({
     summary: form.summary,

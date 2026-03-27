@@ -397,7 +397,7 @@ const addInputRef    = ref<HTMLInputElement | null>(null)
 const dragState = reactive({ taskId: -1, fromColId: '' })
 const dropIndicator = reactive({ colId: '', beforeTaskId: null as number | null })
 
-function onDragStart(task: Task, colId: string, e: DragEvent) {
+const onDragStart = (task: Task, colId: string, e: DragEvent) => {
   dragState.taskId = task.id
   dragState.fromColId = colId
   e.dataTransfer!.effectAllowed = 'move'
@@ -406,28 +406,28 @@ function onDragStart(task: Task, colId: string, e: DragEvent) {
   setTimeout(() => {}, 0)
 }
 
-function onDragEnd() {
+const onDragEnd = () => {
   dragState.taskId = -1
   dragState.fromColId = ''
   dropIndicator.colId = ''
   dropIndicator.beforeTaskId = null
 }
 
-function onColDragOver(colId: string, e: DragEvent) {
+const onColDragOver = (colId: string, e: DragEvent) => {
   e.preventDefault()
   // If hovering the empty space below all cards, show indicator at bottom
   dropIndicator.colId = colId
   dropIndicator.beforeTaskId = null
 }
 
-function onColDragLeave(colId: string) {
+const onColDragLeave = (colId: string) => {
   if (dropIndicator.colId === colId) {
     dropIndicator.colId = ''
     dropIndicator.beforeTaskId = null
   }
 }
 
-function onCardDragOver(colId: string, taskId: number, e: DragEvent) {
+const onCardDragOver = (colId: string, taskId: number, e: DragEvent) => {
   e.stopPropagation()
   const el = (e.currentTarget as HTMLElement)
   const rect = el.getBoundingClientRect()
@@ -437,14 +437,14 @@ function onCardDragOver(colId: string, taskId: number, e: DragEvent) {
   dropIndicator.beforeTaskId = e.clientY < midY ? taskId : getNextTaskId(colId, taskId)
 }
 
-function getNextTaskId(colId: string, taskId: number): number | null {
+const getNextTaskId = (colId: string, taskId: number): number | null => {
   const col = columns.find(c => c.id === colId)
   if (!col) return null
   const idx = col.tasks.findIndex(t => t.id === taskId)
   return col.tasks[idx + 1]?.id ?? null
 }
 
-function onDrop(colId: string, e: DragEvent) {
+const onDrop = (colId: string, e: DragEvent) => {
   e.preventDefault()
   const taskId = Number(e.dataTransfer!.getData('text/plain'))
   if (!taskId) return
@@ -479,11 +479,11 @@ const tagMap: Record<string, [string, string]> = {
 }
 const tagBg = (c?: string) => tagMap[c ?? '']?.[0] ?? '#f1f5f9'
 const tagFg = (c?: string) => tagMap[c ?? '']?.[1] ?? '#475569'
-function isOverdue(date?: string) { return !!date && new Date(date) < new Date() }
+const isOverdue = (date?: string) => { return !!date && new Date(date) < new Date() }
 
 const priorityOrder: Record<string, number> = { High: 0, Medium: 1, Low: 2 }
 
-function visibleTasks(tasks: Task[]): Task[] {
+const visibleTasks = (tasks: Task[]): Task[] => {
   let list = [...tasks]
   if (!showDone.value)                              list = list.filter(t => !t.done)
   if (activeFilters.value.includes('incomplete'))   list = list.filter(t => !t.done)
@@ -518,18 +518,18 @@ const columns = reactive<Col[]>([
   { id: 'next-week', title: 'Do next week', color: '#10b981', tasks: [] },
 ])
 
-function closeAll() { colMenuOpen.value = null; taskMenuOpen.value = false; collabPickerOpen.value = false; assigneePickerOpen.value = false }
-function openTask(task: Task) { selected.value = task; taskMenuOpen.value = false; collabPickerOpen.value = false }
-function toggleDone(task: Task) { task.done = !task.done }
-function toggleColMenu(id: string) { colMenuOpen.value = colMenuOpen.value === id ? null : id }
-function startEditCol(col: Col) {
+const closeAll = () => { colMenuOpen.value = null; taskMenuOpen.value = false; collabPickerOpen.value = false; assigneePickerOpen.value = false }
+const openTask = (task: Task) => { selected.value = task; taskMenuOpen.value = false; collabPickerOpen.value = false }
+const toggleDone = (task: Task) => { task.done = !task.done }
+const toggleColMenu = (id: string) => { colMenuOpen.value = colMenuOpen.value === id ? null : id }
+const startEditCol = (col: Col) => {
   col.editing = true
   nextTick(() => { const el = document.querySelector('.col-title-input') as HTMLInputElement; el?.focus(); el?.select() })
 }
 
 let nid = 300
-function addTask(colId: string) { addingIn.value = colId; newTaskName.value = ''; nextTick(() => addInputRef.value?.focus()) }
-function confirmAdd(colId: string) {
+const addTask = (colId: string) => { addingIn.value = colId; newTaskName.value = ''; nextTick(() => addInputRef.value?.focus()) }
+const confirmAdd = (colId: string) => {
   const name = newTaskName.value.trim()
   if (!name) { addingIn.value = null; return }
   const col = columns.find(c => c.id === colId)
@@ -539,14 +539,14 @@ function confirmAdd(colId: string) {
   }
   addingIn.value = null; newTaskName.value = ''
 }
-function removeColumn(colId: string) {
+const removeColumn = (colId: string) => {
   const idx = columns.findIndex(c => c.id === colId)
   if (idx !== -1) columns.splice(idx, 1)
   if (selected.value) selected.value = null
 }
-function addSection() { columns.push({ id: `s-${Date.now()}`, title: 'Untitled section', color: '#94a3b8', tasks: [] }) }
-function assignSelf() { if (selected.value) selected.value.assignee = { name: 'Me', initials: 'Me', bg: '#4f46e5' } }
-function toggleAssigneePicker() {
+const addSection = () => { columns.push({ id: `s-${Date.now()}`, title: 'Untitled section', color: '#94a3b8', tasks: [] }) }
+const assignSelf = () => { if (selected.value) selected.value.assignee = { name: 'Me', initials: 'Me', bg: '#4f46e5' } }
+const toggleAssigneePicker = () => {
   assigneePickerOpen.value = !assigneePickerOpen.value
   if (assigneePickerOpen.value && assigneeTriggerRef.value) {
     assigneeSearch.value = ''
@@ -559,17 +559,17 @@ function toggleAssigneePicker() {
     }
   }
 }
-function addSubtask() { if (selected.value) selected.value.subtasks.push({ id: Date.now(), name: 'New subtask', done: false }) }
-function removeSubtask(id: number) { if (selected.value) selected.value.subtasks = selected.value.subtasks.filter(s => s.id !== id) }
-function removeAttachment(name: string) { if (selected.value) selected.value.attachments = selected.value.attachments.filter(a => a.name !== name) }
+const addSubtask = () => { if (selected.value) selected.value.subtasks.push({ id: Date.now(), name: 'New subtask', done: false }) }
+const removeSubtask = (id: number) => { if (selected.value) selected.value.subtasks = selected.value.subtasks.filter(s => s.id !== id) }
+const removeAttachment = (name: string) => { if (selected.value) selected.value.attachments = selected.value.attachments.filter(a => a.name !== name) }
 
 let cid = 500
-function postComment() {
+const postComment = () => {
   if (!selected.value || !newComment.value.trim()) return
   selected.value.comments.push({ id: cid++, author: 'Me', avInitials: 'Me', avBg: '#4f46e5', text: newComment.value.trim(), time: 'Just now' })
   newComment.value = ''
 }
-function deleteComment(id: number) { if (selected.value) selected.value.comments = selected.value.comments.filter(c => c.id !== id) }
+const deleteComment = (id: number) => { if (selected.value) selected.value.comments = selected.value.comments.filter(c => c.id !== id) }
 
 const availableCollaborators: Assignee[] = [
   { name: 'Arjun P.', initials: 'AP', bg: '#fed7aa' }, { name: 'Sara M.', initials: 'SM', bg: '#fef3c7' },
@@ -581,22 +581,22 @@ const filteredAssignees = computed(() =>
     ? availableCollaborators.filter(u => u.name.toLowerCase().includes(assigneeSearch.value.toLowerCase()))
     : availableCollaborators
 )
-function toggleCollaborator(user: Assignee) {
+const toggleCollaborator = (user: Assignee) => {
   if (!selected.value) return
   const idx = selected.value.collaborators.findIndex(c => c.name === user.name)
   if (idx !== -1) selected.value.collaborators.splice(idx, 1)
   else selected.value.collaborators.push({ ...user })
 }
-function removeCollaborator(name: string) { if (selected.value) selected.value.collaborators = selected.value.collaborators.filter(c => c.name !== name) }
-function duplicateTask() {
+const removeCollaborator = (name: string) => { if (selected.value) selected.value.collaborators = selected.value.collaborators.filter(c => c.name !== name) }
+const duplicateTask = () => {
   if (!selected.value) return
   const col = columns.find(c => c.tasks.some(t => t.id === selected.value!.id))
   if (!col) return
   const copy: Task = { ...JSON.parse(JSON.stringify(selected.value)), id: nid++ }
   copy.name += ' (copy)'; col.tasks.push(copy)
 }
-function convertToMilestone() { if (selected.value) selected.value.isMilestone = !selected.value.isMilestone }
-function deleteTask() {
+const convertToMilestone = () => { if (selected.value) selected.value.isMilestone = !selected.value.isMilestone }
+const deleteTask = () => {
   if (!selected.value) return
   for (const col of columns) {
     const idx = col.tasks.findIndex(t => t.id === selected.value!.id)
@@ -604,7 +604,7 @@ function deleteTask() {
   }
   selected.value = null
 }
-function autoResize(e: Event) { const el = e.target as HTMLTextAreaElement; el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px' }
+const autoResize = (e: Event) => { const el = e.target as HTMLTextAreaElement; el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px' }
 </script>
 
 <style scoped>

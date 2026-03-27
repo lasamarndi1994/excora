@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <v-navigation-drawer
     v-model="uiStore.drawer"
     :location="$vuetify.display.mobile ? 'bottom' : undefined"
@@ -77,7 +77,7 @@ import { useUiStore } from '@/stores/uiStore'
 const uiStore = useUiStore()
 const route   = useRoute()
 
-function isActive(path: string) {
+const isActive = (path: string) => {
   return route.path === path || route.path.startsWith(path + '/')
 }
 
