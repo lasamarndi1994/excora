@@ -8,9 +8,13 @@
         <p class="proj-sub">Manage and track all your team's work</p>
       </div>
       <div class="proj-header-right">
-        <button class="hdr-btn"><v-icon size="13">mdi-filter-variant</v-icon> Filter</button>
-        <button class="hdr-btn hdr-btn--primary" @click="$router.push('/project/spaces')">
-          <v-icon size="13">mdi-plus</v-icon> New Project
+        <button class="hdr-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Filter
+        </button>
+        <button class="hdr-btn hdr-btn--primary" @click="showCreate = true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+          New Project
         </button>
       </div>
     </div>
@@ -157,6 +161,77 @@
       </div>
 
     </div>
+
+    <!-- Create Project Modal -->
+    <teleport to="body">
+      <div v-if="showCreate" class="dialog-overlay" @click.self="showCreate = false">
+        <div class="dialog">
+          <div class="dialog-hd">
+            <span class="dialog-title">Create Project</span>
+            <button class="dialog-close" @click="showCreate = false">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="dialog-body">
+            <div class="form-group">
+              <label class="form-label">Project Name <span class="req">*</span></label>
+              <input v-model="newProject.name" class="form-input" :class="{ 'form-input--error': nameError }"
+                placeholder="e.g. Mobile App Development" @input="nameError = false" />
+              <span v-if="nameError" class="form-error">Project name is required.</span>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Project Type</label>
+                <select v-model="newProject.type" class="form-select">
+                  <option>Scrum</option>
+                  <option>Kanban</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Sprint Duration</label>
+                <select v-model="newProject.sprint" class="form-select">
+                  <option>1 Week</option>
+                  <option>2 Weeks</option>
+                  <option>3 Weeks</option>
+                  <option>4 Weeks</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Start Date</label>
+                <input v-model="newProject.startDate" type="date" class="form-input" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Lead</label>
+                <select v-model="newProject.lead" class="form-select">
+                  <option>Satya Ranjan Bal</option>
+                  <option>Lasa Marandi</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Color</label>
+              <div class="color-row">
+                <button v-for="c in colorPalette" :key="c" class="color-swatch"
+                  :style="{ background: c, outline: newProject.color === c ? '2px solid #0f172a' : 'none', outlineOffset: '2px' }"
+                  @click="newProject.color = c"></button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea v-model="newProject.description" class="form-textarea" rows="3"
+                placeholder="Brief project description…"></textarea>
+            </div>
+          </div>
+          <div class="dialog-footer">
+            <button class="dlg-btn" @click="showCreate = false">Cancel</button>
+            <button class="dlg-btn dlg-btn--primary" @click="createProject">Create Project</button>
+          </div>
+        </div>
+      </div>
+    </teleport>
+
   </div>
 </template>
 
@@ -164,6 +239,17 @@
 import { ref } from 'vue'
 
 const activeTab = ref('worked')
+const showCreate = ref(false)
+const nameError = ref(false)
+
+const colorPalette = ['#4f46e5','#ef4444','#10b981','#f59e0b','#3b82f6','#a855f7','#ec4899','#0891b2']
+
+const defaultProject = () => ({
+  name: '', type: 'Scrum', sprint: '2 Weeks',
+  startDate: '', lead: 'Satya Ranjan Bal',
+  description: '', color: '#4f46e5',
+})
+const newProject = ref(defaultProject())
 
 const activityTabs = [
   { value: 'worked',   label: 'Worked on' },
@@ -194,8 +280,27 @@ const viewedItems = [
   { target: 'Velocity Chart Q1 2025', project: 'Analytics', time: '3h ago', icon: 'mdi-eye-outline', iconBg: '#f8fafc', iconColor: '#64748b' },
   { target: 'Marketing campaign assets', project: 'Marketing Asset Creation', time: 'Yesterday', icon: 'mdi-eye-outline', iconBg: '#f8fafc', iconColor: '#64748b' },
 ]
-</script>
 
+const createProject = () => {
+  if (!newProject.value.name.trim()) { nameError.value = true; return }
+  spaces.value.unshift({
+    name: newProject.value.name,
+    key: newProject.value.name.replace(/\s+/g, '').slice(0, 4).toUpperCase(),
+    type: `Team-managed ${newProject.value.type === 'Scrum' ? 'software' : 'business'}`,
+    icon: 'mdi-folder-outline',
+    iconBg: newProject.value.color + '22',
+    iconColor: newProject.value.color,
+    accentColor: newProject.value.color,
+    leadName: newProject.value.lead.split(' ').map(w => w[0]).join('') + '.',
+    leadInitials: newProject.value.lead.split(' ').map(w => w[0]).join('').slice(0, 2),
+    leadBg: '#e0e7ff',
+    starred: false,
+    done: 0,
+  })
+  showCreate.value = false
+  newProject.value = defaultProject()
+}
+</script>
 <style scoped>
 .proj-root {
   display: flex; flex-direction: column; height: 100%; overflow: hidden;
@@ -341,4 +446,32 @@ const viewedItems = [
   .activity-tabs { overflow-x: auto; }
   .act-tab { white-space: nowrap; }
 }
+
+/* ── Create Project Modal ── */
+.dialog-overlay { position:fixed; inset:0; background:rgba(15,23,42,.4); z-index:1200; display:flex; align-items:center; justify-content:center; padding:20px; }
+.dialog { background:#fff; border-radius:16px; width:100%; max-width:560px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,.18); font-family:'Inter',sans-serif; animation:scaleIn .2s ease; overflow:hidden; }
+.dialog-hd { display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid #e2e8f0; flex-shrink:0; }
+.dialog-title { font-size:15px; font-weight:700; color:#0f172a; }
+.dialog-close { display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:7px; border:none; background:none; color:#94a3b8; cursor:pointer; transition:background .12s; }
+.dialog-close:hover { background:#f1f5f9; color:#475569; }
+.dialog-body { flex:1; overflow-y:auto; padding:20px 22px; display:flex; flex-direction:column; gap:14px; }
+.form-group { display:flex; flex-direction:column; gap:5px; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.form-label { font-size:12px; font-weight:600; color:#475569; }
+.req { color:#ef4444; }
+.form-input, .form-select, .form-textarea { padding:8px 12px; border-radius:8px; border:1px solid #e2e8f0; background:#f8fafc; font-size:13px; color:#1e293b; font-family:'Inter',sans-serif; outline:none; transition:border-color .15s,box-shadow .15s; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color:#a5b4fc; box-shadow:0 0 0 3px rgba(99,102,241,.1); background:#fff; }
+.form-input--error { border-color:#ef4444; }
+.form-error { font-size:11.5px; color:#ef4444; }
+.form-textarea { resize:vertical; min-height:72px; }
+.form-select { appearance:none; cursor:pointer; }
+.color-row { display:flex; gap:8px; flex-wrap:wrap; }
+.color-swatch { width:24px; height:24px; border-radius:50%; border:none; cursor:pointer; transition:transform .12s; flex-shrink:0; }
+.color-swatch:hover { transform:scale(1.2); }
+.dialog-footer { display:flex; justify-content:flex-end; gap:8px; padding:14px 22px; border-top:1px solid #e2e8f0; background:#f8fafc; flex-shrink:0; }
+.dlg-btn { padding:8px 18px; border-radius:8px; border:1px solid #e2e8f0; background:#fff; font-size:12.5px; font-weight:500; color:#475569; cursor:pointer; font-family:'Inter',sans-serif; transition:background .12s; }
+.dlg-btn:hover { background:#f1f5f9; }
+.dlg-btn--primary { background:#4f46e5; border-color:#4f46e5; color:#fff; box-shadow:0 2px 8px rgba(79,70,229,.25); }
+.dlg-btn--primary:hover { background:#4338ca; }
+@keyframes scaleIn { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:scale(1); } }
 </style>

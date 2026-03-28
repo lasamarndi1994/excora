@@ -109,7 +109,7 @@ const router = createRouter({
         {
           path: 'project/spaces',
           name: 'Spaces',
-          component: () => import('@/main/project/SpacesPage.vue'),
+          component: () => import('@/main/project/AllProjectPage.vue'),
         },
         {
           path: 'inbox',
